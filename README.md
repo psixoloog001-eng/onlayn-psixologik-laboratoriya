@@ -21,6 +21,12 @@ O'zbek va rus tillaridagi bepul onlayn psixologik laboratoriya. Ro'yxatdan o'tis
 - Go/No-Go — impulsni nazorat qilish (40 urinish)
 - Corsi bloklari — ko'rish-fazoviy xotira hajmi
 
+**Kutubxona va video darslar**
+- Har bir metodikaning tavsifi (maqsadi, o'tkazish tartibi, talqini, manbasi)
+- O'quv materiallari va bepul ochiq darsliklar
+- YouTube video darslar: saytdan foydalanish, psixologiya darslari, amaliy mashqlar
+- Interaktiv "kvadrat nafas" va 5–4–3–2–1 xotirjamlashish mashqlari
+
 **Natijalar**
 - Barcha natijalar tarixi
 - CSV formatida yuklab olish (Excel, SPSS, R uchun)
@@ -38,6 +44,17 @@ Hech narsa o'rnatish shart emas: `index.html` faylini brauzerda oching yoki GitH
 | `app.js` | Asosiy testlar, tajribalar, tarjimalar va natijalar |
 | `modules.js` | Qo'shimcha testlar va tajribalar (Rozenberg, Mini-IPIP, Shulte, Go/No-Go, Corsi) |
 | `modules.css` | Qo'shimcha modullar dizayni |
+| `conclusions.js` | Har bir natijadan keyingi xulosa matnlari |
+| `library.js` | Kutubxona, video darslar va mashqlar |
+
+## Material yoki video qo'shish
+
+`library.js` faylining boshida ikkita ro'yxat bor:
+
+- `MATERIALS` — o'quv materiallari. Faylni `kutubxona/` papkasiga yuklang va ro'yxatga yozing:
+  `{ title: { uz: 'Nomi', ru: 'Название' }, desc: { uz: 'Tavsif', ru: 'Описание' }, url: 'kutubxona/fayl.pdf' }`
+- `VIDEOS` — YouTube videolar. `cat`: `guide` (saytdan foydalanish), `lesson` (darslar), `practice` (mashqlar):
+  `{ cat: 'lesson', title: { uz: 'Nomi', ru: 'Название' }, url: 'https://www.youtube.com/watch?v=...' }`
 
 ## Muhim eslatma
 
