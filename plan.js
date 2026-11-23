@@ -140,7 +140,7 @@ function stats() {
 }
 
 /* Natijalar dinamikasi uchun ko'rsatkichlar: [id, yaxshilanish yo'nalishi (+1 o'sish yaxshi, -1 kamayish yaxshi)] */
-const METRICS = [['schulte', -1], ['stroop', -1], ['flanker', -1], ['rt', -1], ['span', 1], ['corsi', 1], ['nback', 1], ['words', 1], ['trail', -1], ['hanoi', -1], ['gonogo', -1], ['phq9', -1], ['gad7', -1], ['pss10', -1], ['rosenberg', 1]];
+const METRICS = [['schulte', -1], ['stroop', -1], ['flanker', -1], ['rt', -1], ['span', 1], ['corsi', 1], ['nback', 1], ['words', 1], ['trail', -1], ['hanoi', -1], ['gonogo', -1], ['phq9', -1], ['gad7', -1], ['pss10', -1], ['rosenberg', 1], ['logic', 1]];
 function spark(vals) {
   const w = 120, h = 32, mn = Math.min(...vals), mx = Math.max(...vals), rg = mx - mn || 1;
   const pts = vals.map((v, i) => `${(vals.length === 1 ? w / 2 : i * w / (vals.length - 1)).toFixed(1)},${(h - 4 - (v - mn) / rg * (h - 8)).toFixed(1)}`).join(' ');

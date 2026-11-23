@@ -12,10 +12,11 @@
     memory: { c: '#9B8CFF', uz: 'Xotira', ru: 'Память', i: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5" fill="currentColor"/>' },
     control: { c: '#7BE495', uz: 'Fikrlash va nazorat', ru: 'Мышление и контроль', i: '<path d="M4 18 9 8l4 6 3-4 4 8"/><circle cx="9" cy="8" r="1.6"/><circle cx="16" cy="10" r="1.6"/>' },
     speed: { c: '#FF9F5A', uz: 'Reaksiya tezligi', ru: 'Скорость реакции', i: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>' },
+    reason: { c: '#8FD3FF', uz: 'Mantiqiy fikrlash', ru: 'Логическое мышление', i: '<path d="M9 3h6v4a2 2 0 1 0 0 4v4h-4a2 2 0 1 1-4 0H3V9h4a2 2 0 1 0 0-4V3z" transform="translate(2 3)"/>' },
     body: { c: '#FF6F91', uz: 'Tana reaksiyasi', ru: 'Реакция тела', i: '<path d="M3 12h4l2-5 4 10 2-5h6"/>' }
   };
   const OF = {
-    phq9: 'mood', gad7: 'stress', pss10: 'stress', rosenberg: 'self', ipip: 'persona',
+    phq9: 'mood', gad7: 'stress', pss10: 'stress', rosenberg: 'self', ipip: 'persona', logic: 'reason', accent: 'persona',
     rt: 'speed', stroop: 'attention', span: 'memory', schulte: 'attention', gonogo: 'control', corsi: 'memory',
     nback: 'memory', flanker: 'attention', trail: 'control', words: 'memory', hanoi: 'control', pulse: 'body'
   };

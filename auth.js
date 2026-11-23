@@ -527,6 +527,19 @@ async function viewGroup(code) {
 }
 function alertBox(m) { const p = document.createElement('p'); p.className = 'notice danger'; p.textContent = m; app.prepend(p); }
 
+/* ---------- Mantiqiy test: savollar tahlili (qiyinlik indeksi) ---------- */
+function itemAnalysis(rows) {
+  const lg = rows.map(x => x.r).filter(r => r.id === 'logic' && Array.isArray(r.ans));
+  if (!lg.length || !window.PL_LOGIC_ORDER) return '';
+  const ord = window.PL_LOGIC_ORDER;
+  const sec = { s: L('Sonlar qatori', 'Числовые ряды'), v: L('Mantiqiy masala', 'Логическая задача'), m: L('Matritsa', 'Матрица') };
+  const mean = lg.reduce((a, r) => a + r.score, 0) / lg.length;
+  return `<h2>${L('Mantiqiy test: savollar tahlili', 'Логический тест: анализ заданий')}</h2>
+    <p class="meta">${L('Topshirganlar', 'Участников')}: ${lg.length} · ${L("o'rtacha ball", 'средний балл')}: ${Math.round(mean * 10) / 10} / 24. ${esc(L("Qiyinlik indeksi — to'g'ri javob bergan ishtirokchilar ulushi.", 'Индекс трудности — доля участников, ответивших верно.'))}</p>
+    <table><tr><th>#</th><th>${L('Savol', 'Задание')}</th><th>${L('Turi', 'Тип')}</th><th>${L("To'g'ri javob, %", 'Верно, %')}</th></tr>
+    ${ord.map((id, i) => { const p = Math.round(lg.reduce((a, r) => a + (r.ans[i] || 0), 0) / lg.length * 100); return `<tr><td>${i + 1}</td><td>${id}</td><td>${sec[id[0]]}</td><td>${p}%</td></tr>`; }).join('')}</table>`;
+}
+
 /* ---------- Admin paneli ---------- */
 async function viewAdmin() {
   if (!authReady) { app.innerHTML = loading(); return; }
@@ -578,6 +591,7 @@ async function viewAdmin() {
       ${psychs.map(q => `<tr><td>${esc(q.name)}</td><td>${esc(q.email)}</td><td>${esc(q.org || '')}</td><td>${esc(fmtDay(q.approvedAt))}</td><td><button class="btn secondary sm" data-rm="${esc(q.uid)}">${L('Huquqni olish', 'Отозвать')}</button></td></tr>`).join('')}</table>`
       : `<p class="meta">${L("Hali yo'q. Siz admin sifatida kabinetdan o'zingiz ham foydalana olasiz.", 'Пока нет. Как администратор вы и сами можете пользоваться кабинетом.')}</p>`}
 
+    ${itemAnalysis(rows)}
     <h2>${L('Barcha natijalar', 'Все результаты')}</h2>
     <div class="row-actions">
       <select id="flt" class="adm-sel"><option value="">${L('Barcha testlar', 'Все тесты')}</option>${ids.map(id => { const x = rows.find(y => y.r.id === id); return `<option value="${esc(id)}">${esc(x.d.name)}</option>`; }).join('')}</select>
