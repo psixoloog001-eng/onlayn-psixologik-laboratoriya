@@ -224,7 +224,6 @@ function finish(S, marks) {
   const bw = (W - 2 * P) / rows.length;
   const chart = `<svg viewBox="0 0 ${W} ${H}" class="curve" role="img">
     <line x1="${P}" y1="${y(base)}" x2="${W - P}" y2="${y(base)}" stroke="#94a3b8" stroke-dasharray="5 4"/>
-    <text x="${W - P}" y="${y(base) - 6}" text-anchor="end" font-size="11" fill="#5b6478">${esc(L('tinch holat', 'покой'))} ${Math.round(base)}</text>
     ${rows.map((r, i) => r.bpm ? `<rect x="${P + i * bw + 8}" y="${y(r.bpm)}" width="${bw - 16}" height="${H - P - y(r.bpm)}" rx="6" fill="${r.kind === 'emo' ? '#ec4899' : '#94a3b8'}"/>
       <text x="${P + i * bw + bw / 2}" y="${y(r.bpm) - 6}" text-anchor="middle" font-size="12" fill="#1d2433">${Math.round(r.bpm)}</text>` : '').join('')}
     ${rows.map((r, i) => `<text x="${P + i * bw + bw / 2}" y="${H - P + 16}" text-anchor="middle" font-size="11" fill="#5b6478">${esc(r.word)}</text>`).join('')}
@@ -238,7 +237,7 @@ function finish(S, marks) {
       <tr><th>${L("Hayajonli so'zlarda", 'На эмоциональных словах')}</th><td>${Math.round(emo)}</td></tr>
       <tr><th>${L('Signal sifati', 'Качество сигнала')}</th><td>${quality}%</td></tr>
     </table>
-    <div style="width:100%"><div class="meta">${esc(L("Har bir so'zdagi puls (pushti — hayajonli, kulrang — neytral)", 'Пульс на каждом слове (розовые — эмоциональные, серые — нейтральные)'))}</div>${chart}</div>
+    <div style="width:100%"><div class="meta">${esc(L("Har bir so'zdagi puls (pushti — hayajonli, kulrang — neytral, kesik chiziq — tinch holat)", 'Пульс на каждом слове (розовые — эмоциональные, серые — нейтральные, пунктир — покой)'))}</div>${chart}</div>
     <p class="meta">${esc(L("Bu tibbiy asbob emas: kamera orqali o'lchangan puls taxminiy. Usul terining galvanik reaksiyasi (TGR) o'rniga emotsional qo'zg'alishni yurak urishi orqali baholaydi.", 'Это не медицинский прибор: пульс, измеренный камерой, ориентировочный. Метод оценивает эмоциональное возбуждение по пульсу вместо кожно-гальванической реакции (КГР).'))}</p>
     ${concl(ps)}${again()}`;
   document.getElementById('again').onclick = viewPulse;
