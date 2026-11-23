@@ -23,6 +23,8 @@ Object.assign(T.uz, {
   libTitle: 'Onlayn kutubxona', libLead: "Metodikalar tavsifi, ochiq darsliklar va o'quv materiallari.",
   libMethods: 'Metodikalar tavsifi', libOpen: 'Bepul ochiq darsliklar', libMine: "O'quv materiallari",
   libEmpty: "Bu bo'limga tez orada o'quv qo'llanmalari va ma'ruzalar qo'shiladi.",
+  libBiblio: 'Tavsiya etiladigan adabiyotlar', libBiblioNote: "Bu kitoblar mualliflik huquqi bilan himoyalangan, shuning uchun saytda faqat ro'yxat keltirilgan. Ularni universitet kutubxonasi yoki nashriyotdan topishingiz mumkin.",
+  bUz: "O'zbek tilida", bRu: 'Rus tilida', bEn: 'Ingliz tilida',
   fPurpose: 'Maqsadi', fProc: "O'tkazish va hisoblash", fInterp: 'Talqin', fSource: 'Manba',
   open: 'Ochish', goTest: "Testni boshlash",
   vidTitle: 'Video darslar va mashqlar', vidLead: "Saytdan foydalanish bo'yicha ko'rsatmalar, psixologiya darslari va video bilan bajariladigan mashqlar.",
@@ -41,6 +43,8 @@ Object.assign(T.ru, {
   libTitle: 'Онлайн-библиотека', libLead: 'Описания методик, открытые учебники и учебные материалы.',
   libMethods: 'Описания методик', libOpen: 'Бесплатные открытые учебники', libMine: 'Учебные материалы',
   libEmpty: 'В этот раздел скоро будут добавлены учебные пособия и лекции.',
+  libBiblio: 'Рекомендуемая литература', libBiblioNote: 'Эти книги защищены авторским правом, поэтому на сайте приведён только список. Их можно найти в университетской библиотеке или у издательства.',
+  bUz: 'На узбекском языке', bRu: 'На русском языке', bEn: 'На английском языке',
   fPurpose: 'Цель', fProc: 'Проведение и подсчёт', fInterp: 'Интерпретация', fSource: 'Источник',
   open: 'Открыть', goTest: 'Начать тест',
   vidTitle: 'Видеоуроки и упражнения', vidLead: 'Инструкции по работе с сайтом, уроки психологии и упражнения с видео.',
@@ -102,8 +106,39 @@ const OPEN_BOOKS = [
     ru: { t: 'Noba Project', d: 'Более 100 бесплатных модулей по психологии, написанных экспертами (на английском).' } },
   { url: 'https://ipip.ori.org/',
     uz: { t: 'International Personality Item Pool (IPIP)', d: "Shaxs testlari uchun ochiq foydalanishdagi savollar banki. Mini-IPIP testi shu yerdan olingan." },
-    ru: { t: 'International Personality Item Pool (IPIP)', d: 'Открытый банк утверждений для личностных тестов. Тест Mini-IPIP взят отсюда.' } }
+    ru: { t: 'International Personality Item Pool (IPIP)', d: 'Открытый банк утверждений для личностных тестов. Тест Mini-IPIP взят отсюда.' } },
+  { url: 'https://digitalcommons.unl.edu/psychfacpub/605',
+    uz: { t: 'Edwards C.P. (1993). Behavioral Sex Differences in Children of Diverse Cultures', d: "Turli madaniyatlardagi bolalarning xulq-atvoridagi jinsiy farqlar (go'daklarga g'amxo'rlik misolida). Nebraska universiteti repozitoriysida bepul PDF (ingliz tilida)." },
+    ru: { t: 'Edwards C.P. (1993). Behavioral Sex Differences in Children of Diverse Cultures', d: 'Половые различия в поведении детей разных культур (на примере заботы о младенцах). Бесплатный PDF в репозитории Университета Небраски (на английском).' } }
 ];
+
+/* ---------- Tavsiya etiladigan adabiyotlar (fayllarsiz, faqat ro'yxat) ---------- */
+const BIBLIO = {
+  uz: [
+    "Mamadiyarov O'.E. Ma'naviyat psixologiyasi: darslik. — Qarshi: Big Makro World, 2026.",
+    "Mamadiyarov O'.E. Klinik psixologiya: o'quv qo'llanma. — Qarshi: Big Makro World, 2026."
+  ],
+  ru: [
+    'Абрамова Г.С. Возрастная психология. — М.: Академический проект; Екатеринбург: Деловая книга, 2000.',
+    'Андреева Г.М. Социальная психология: учебник для высших учебных заведений. — 1999.',
+    'Антипов В.В. Психологическая адаптация к экстремальным ситуациям. — М.: Владос (серия «Психология для всех»).',
+    'Бодалев А.А., Столин В.В. (ред.) Общая психодиагностика. — СПб.: Речь, 2000.',
+    'Базаров Т.Ю. Психология управления персоналом. Теория и практика: учебник для бакалавров. — М.: Юрайт.',
+    'Выготский Л.С. Основы дефектологии (Собрание сочинений, т. 5). — М.: Педагогика, 1983.',
+    'Гиппиус С.В. Тренинг развития креативности. Гимнастика чувств. — СПб.: Речь, 2001.',
+    'Голдстейн Б., ван Хофф Й. Когнитивная психология. 6-е изд. (пер. с англ.) — Cengage Learning EMEA, 2024.',
+    'Карабанова О.А. Возрастная психология: конспект лекций.',
+    'Лубовский В.И. (ред.) Специальная психология: учебное пособие. 2-е изд. — М.: Академия, 2005.',
+    'Лурия А.Р. Основы нейропсихологии: учебное пособие. 8-е изд.',
+    'Рыбалко Е.Ф. Возрастная и дифференциальная психология. — Л.: Изд-во Ленинградского университета.',
+    'Семёнова Е.М. Тренинг эмоциональной устойчивости педагога: учебное пособие. 3-е изд.',
+    'Цзен Н.В., Пахомов Ю.В. Психотренинг: игры и упражнения. — М.: Независимая фирма «Класс», 1999.'
+  ],
+  en: [
+    'Carey G. Human Genetics for the Social Sciences. — Thousand Oaks: SAGE, 2003.',
+    'Plomin R., DeFries J.C., McClearn G.E., McGuffin P. Behavioral Genetics. 5th ed. — New York: Worth.'
+  ]
+};
 
 /* ---------- Sahifalar ---------- */
 function viewLibrary() {
@@ -129,7 +164,12 @@ function viewLibrary() {
     <h1>${esc(t('libTitle'))}</h1><p class="lead">${esc(t('libLead'))}</p>
     <h2>${esc(t('libMethods'))}</h2>${methods}
     <h2>${esc(t('libMine'))}</h2>${mine}
-    <h2>${esc(t('libOpen'))}</h2><div class="grid">${books}</div>`;
+    <h2>${esc(t('libOpen'))}</h2><div class="grid">${books}</div>
+    <h2>${esc(t('libBiblio'))}</h2>
+    <div class="card biblio">
+      ${[['uz', 'bUz'], ['ru', 'bRu'], ['en', 'bEn']].map(([k, h]) => `<h3>${esc(t(h))}</h3><ol>${BIBLIO[k].map(b => `<li>${esc(b)}</li>`).join('')}</ol>`).join('')}
+      <p class="meta">${esc(t('libBiblioNote'))}</p>
+    </div>`;
 }
 
 function ytId(url) {
@@ -211,7 +251,8 @@ style.textContent = `
 .breath-stage{display:flex;flex-direction:column;align-items:center;gap:.8rem;padding:1rem 0}
 .breath-circle{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#91a7ff,#3b5bdb);display:flex;align-items:center;justify-content:center;transform:scale(.55);transition:transform 4s ease-in-out}
 .breath-circle span{color:#fff;font-size:2.4rem;font-weight:700}
-.steps li{margin:.3rem 0}`;
+.steps li{margin:.3rem 0}
+.biblio h3{margin:.6rem 0 .2rem;font-size:1rem}.biblio ol{margin:.2rem 0 .6rem;padding-left:1.4rem}.biblio li{margin:.25rem 0}`;
 document.head.appendChild(style);
 
 /* ---------- Menyu va marshrut ---------- */
