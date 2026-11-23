@@ -1,0 +1,100 @@
+/* PsixoLab — jonli fon va umumiy dizayn */
+
+/* ---------- Fon: sekin harakatlanuvchi gradient + nur dog'lari + neyron to'ri ---------- */
+body {
+  background: linear-gradient(-45deg, #1e1b4b, #4c1d95, #0e7490, #1e3a8a);
+  background-size: 400% 400%;
+  background-attachment: fixed;
+  animation: bgShift 22s ease infinite;
+  min-height: 100vh;
+}
+@keyframes bgShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+body::before, body::after {
+  content: ''; position: fixed; z-index: -1; pointer-events: none; border-radius: 50%; filter: blur(70px);
+}
+body::before {
+  width: 520px; height: 520px; top: -140px; left: -120px;
+  background: radial-gradient(circle, rgba(236, 72, 153, .45), transparent 70%);
+  animation: floatA 18s ease-in-out infinite;
+}
+body::after {
+  width: 600px; height: 600px; bottom: -200px; right: -160px;
+  background: radial-gradient(circle, rgba(45, 212, 191, .40), transparent 70%);
+  animation: floatB 24s ease-in-out infinite;
+}
+@keyframes floatA { 50% { transform: translate(120px, 90px) scale(1.15); } }
+@keyframes floatB { 50% { transform: translate(-140px, -80px) scale(1.1); } }
+html { position: relative; }
+html::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg stroke='%23ffffff' stroke-opacity='0.13' stroke-width='1'%3E%3Cline x1='20' y1='30' x2='95' y2='15'/%3E%3Cline x1='95' y1='15' x2='170' y2='50'/%3E%3Cline x1='170' y1='50' x2='240' y2='22'/%3E%3Cline x1='20' y1='30' x2='60' y2='100'/%3E%3Cline x1='95' y1='15' x2='60' y2='100'/%3E%3Cline x1='95' y1='15' x2='140' y2='120'/%3E%3Cline x1='170' y1='50' x2='140' y2='120'/%3E%3Cline x1='170' y1='50' x2='215' y2='110'/%3E%3Cline x1='240' y1='22' x2='215' y2='110'/%3E%3Cline x1='60' y1='100' x2='140' y2='120'/%3E%3Cline x1='140' y1='120' x2='215' y2='110'/%3E%3Cline x1='60' y1='100' x2='28' y2='185'/%3E%3Cline x1='60' y1='100' x2='100' y2='200'/%3E%3Cline x1='140' y1='120' x2='100' y2='200'/%3E%3Cline x1='140' y1='120' x2='185' y2='180'/%3E%3Cline x1='215' y1='110' x2='185' y2='180'/%3E%3Cline x1='215' y1='110' x2='245' y2='215'/%3E%3Cline x1='28' y1='185' x2='100' y2='200'/%3E%3Cline x1='100' y1='200' x2='185' y2='180'/%3E%3Cline x1='185' y1='180' x2='245' y2='215'/%3E%3Cline x1='28' y1='185' x2='65' y2='245'/%3E%3Cline x1='100' y1='200' x2='65' y2='245'/%3E%3Cline x1='100' y1='200' x2='150' y2='250'/%3E%3Cline x1='185' y1='180' x2='150' y2='250'/%3E%3Cline x1='245' y1='215' x2='150' y2='250'/%3E%3C/g%3E%3Cg fill='%23ffffff' fill-opacity='0.30'%3E%3Ccircle cx='20' cy='30' r='2.5'/%3E%3Ccircle cx='95' cy='15' r='4'/%3E%3Ccircle cx='170' cy='50' r='2.5'/%3E%3Ccircle cx='240' cy='22' r='2.5'/%3E%3Ccircle cx='60' cy='100' r='3'/%3E%3Ccircle cx='140' cy='120' r='4.5'/%3E%3Ccircle cx='215' cy='110' r='2.5'/%3E%3Ccircle cx='28' cy='185' r='2.5'/%3E%3Ccircle cx='100' cy='200' r='3'/%3E%3Ccircle cx='185' cy='180' r='4'/%3E%3Ccircle cx='245' cy='215' r='2.5'/%3E%3Ccircle cx='65' cy='245' r='2.5'/%3E%3Ccircle cx='150' cy='250' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 260px 260px;
+}
+@media (prefers-reduced-motion: reduce) {
+  body, body::before, body::after { animation: none; }
+}
+
+/* ---------- Sarlavha qatori: shisha effekti ---------- */
+.top {
+  background: rgba(15, 12, 45, .45);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+.brand { color: #fff; }
+nav a { color: rgba(255, 255, 255, .78); }
+nav a.active, nav a:hover { color: #fff; text-shadow: 0 0 12px rgba(167, 139, 250, .9); }
+.lang button { background: rgba(255, 255, 255, .1); color: #fff; border-color: rgba(255, 255, 255, .25); }
+.lang button.active { background: #fff; color: #4c1d95; border-color: #fff; }
+
+/* ---------- Fon ustidagi matn — oq ---------- */
+main { color: #f1f2ff; }
+main h1 { font-size: 2.3rem; text-shadow: 0 4px 24px rgba(0, 0, 0, .35); }
+main > h1:first-child {
+  background: linear-gradient(90deg, #ffffff, #c4b5fd 55%, #5eead4);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+main h2 { color: #fff; }
+.lead { color: rgba(241, 242, 255, .85); }
+main .meta { color: rgba(225, 228, 255, .75); }
+main a:not(.btn) { color: #c4b5fd; }
+footer { background: transparent; color: rgba(225, 228, 255, .7); }
+
+/* Oq bloklar ichida matn odatdagidek qoladi */
+.card, .stage, .question, .trait, .lib-item, .conclusion, .notice, table, .video-card, .sch-head {
+  color: var(--text);
+}
+.card .meta, .stage .meta, .question .meta, .trait .meta, .lib-item .meta, .video-card .meta { color: var(--muted); }
+.card a:not(.btn), .lib-item a:not(.btn), .stage a:not(.btn) { color: var(--accent); }
+.sch-head { color: var(--text); }
+
+/* ---------- Kartalar: soya va jonli harakat ---------- */
+.card, .stage, .question, .trait, .lib-item, .video-card, table {
+  border: 1px solid rgba(255, 255, 255, .6);
+  box-shadow: 0 10px 30px rgba(10, 8, 40, .25);
+}
+.card { transition: transform .2s, box-shadow .2s; }
+.card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(10, 8, 40, .35); }
+.notice.warn { background: rgba(255, 244, 229, .96); }
+
+/* ---------- Tugmalar: gradient ---------- */
+.btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 6px 18px rgba(99, 102, 241, .35); }
+.btn:hover { filter: brightness(1.1); }
+.btn.secondary { background: #eef0ff; color: #4c1d95; box-shadow: none; }
+.color-buttons .btn { box-shadow: none; }
+.progress { background: rgba(255, 255, 255, .25); }
+.progress div { background: linear-gradient(90deg, #5eead4, #a78bfa); }
+
+@media (max-width: 600px) { main h1 { font-size: 1.7rem; } }
+
+/* ---------- Telefon: menyu bitta suriladigan qatorda ---------- */
+@media (max-width: 640px) {
+  .top { flex-wrap: wrap; row-gap: .4rem; }
+  .brand { order: 1; flex: 1; }
+  .lang { order: 2; }
+  nav { order: 3; width: 100%; flex: none; flex-wrap: nowrap; overflow-x: auto; gap: 1rem; padding-bottom: .2rem; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
+}
