@@ -316,8 +316,8 @@ function homeBanner() {
     const d = today(), s = stats(), nd = d.tasks.filter(x => x.done).length;
     el.innerHTML = `<div><h3>📋 ${L('Bugungi vazifalar', 'Задания на сегодня')}: ${nd}/${d.tasks.length}</h3><p>🔥 ${s.streak} ${L('kunlik seriya', 'дней подряд')} · ⭐ ${s.xp} XP</p><div class="bar"><span style="width:${Math.round(nd / d.tasks.length * 100)}%"></span></div></div><span class="btn">${nd >= d.tasks.length ? L("Ko'rish", 'Открыть') : L('Davom etish', 'Продолжить')}</span>`;
   }
-  const h1 = app.querySelector('h1');
-  if (h1) h1.after(el); else app.prepend(el);
+  const hero = app.querySelector('.hero'), h1 = app.querySelector('h1');
+  if (hero) hero.after(el); else if (h1) h1.after(el); else app.prepend(el);
 }
 
 /* ---------- Ulanishlar ---------- */
@@ -363,7 +363,7 @@ style.textContent = `
 .cal{aspect-ratio:1;border-radius:5px;background:#eef2ff}.cal.c1{background:#c4b5fd}.cal.c2{background:#8b5cf6}.cal.c3{background:#5b21b6}
 .dyn{color:var(--text)}.dyn-h{font-weight:700}.spark{width:100%;height:40px;margin:.3rem 0}
 .dirpick{display:flex;align-items:center;gap:.6rem;cursor:pointer;color:var(--text)}.dirpick input{width:1.2rem;height:1.2rem}.dir-ic{font-size:1.6rem}
-.plan-banner{display:flex;justify-content:space-between;align-items:center;gap:1rem;text-decoration:none;color:var(--text);margin:1rem 0;border:2px solid #a78bfa}
+.plan-banner{display:flex;justify-content:space-between;align-items:center;gap:1rem;text-decoration:none;color:var(--text);margin:1rem 0}
 .plan-banner h3{margin:0 0 .3rem}.plan-banner p{margin:0 0 .4rem}.plan-banner>div{flex:1}
 .ok-box{background:#dcfce7;color:#166534;border-color:#86efac}
 .pl-toast{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%);background:#166534;color:#fff;padding:.7rem 1.2rem;border-radius:12px;font-weight:600;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.25)}

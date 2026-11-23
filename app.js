@@ -3,7 +3,7 @@
 /* ================= Tarjimalar / Переводы ================= */
 const T = {
   uz: {
-    brand: '🧠 PsixoLab',
+    brand: 'PsixoLab',
     navHome: 'Bosh sahifa', navTests: 'Testlar', navExp: 'Tajribalar', navResults: 'Natijalarim',
     footer: "Natijalar sizning brauzeringizda saqlanadi; profilga kirgan bo'lsangiz — himoyalangan bulutda ham. Bu sayt tibbiy tashxis qo'ymaydi.",
     heroTitle: 'Onlayn psixologik laboratoriya',
@@ -41,7 +41,7 @@ const T = {
     storageOff: "Brauzeringiz ma'lumot saqlashga ruxsat bermayapti, natijalar faqat shu sahifada ko'rinadi."
   },
   ru: {
-    brand: '🧠 PsixoLab',
+    brand: 'PsixoLab',
     navHome: 'Главная', navTests: 'Тесты', navExp: 'Эксперименты', navResults: 'Мои результаты',
     footer: 'Результаты хранятся в вашем браузере, а если вы вошли в профиль — и в защищённом облаке. Сайт не ставит медицинских диагнозов.',
     heroTitle: 'Онлайн психологическая лаборатория',
