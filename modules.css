@@ -1,0 +1,36 @@
+/* PsixoLab — qo'shimcha modullar uchun dizayn */
+
+/* Big Five profili */
+.profile { display: flex; flex-direction: column; gap: 1rem; margin: 1rem 0; }
+.trait { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; }
+.trait-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .4rem; }
+.bar { height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: .4rem; }
+.bar div { height: 100%; background: var(--accent); border-radius: 99px; }
+
+/* Go/No-Go */
+.gng-stim { font-size: 6rem; line-height: 1; min-height: 7rem; color: var(--muted); transition: transform .08s; }
+.gng-stim.go { color: #27ae60; }
+.gng-stim.nogo { color: #d62828; }
+.gng-stim.pressed { transform: scale(.85); }
+.gng-btn { min-width: 220px; padding: 1rem 2rem; font-size: 1.2rem; touch-action: manipulation; }
+
+/* Corsi bloklari */
+.corsi-board { position: relative; width: min(100%, 380px); aspect-ratio: 1; background: #1d2433; border-radius: var(--radius); }
+.corsi-block {
+  position: absolute; width: 15%; aspect-ratio: 1; border: none; border-radius: 8px;
+  background: #3b5bdb; cursor: pointer; transition: background .1s; padding: 0;
+}
+.corsi-block:disabled { cursor: default; }
+.corsi-block.lit { background: #ffd43b; }
+
+/* Shulte jadvallari */
+.sch-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; width: 100%; max-width: 420px; }
+.sch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; width: min(100%, 420px); }
+.sch-cell {
+  aspect-ratio: 1; font-size: clamp(1.1rem, 5vw, 1.8rem); font-weight: 700; border: 1px solid var(--border);
+  background: #fff; color: var(--text); border-radius: 6px; cursor: pointer; touch-action: manipulation;
+}
+.sch-cell.found { background: var(--accent-soft); color: #9aa5bd; }
+.sch-cell.wrong { background: var(--danger); border-color: var(--danger-border); }
+.curve { width: 100%; max-width: 460px; height: auto; display: block; margin: .5rem auto; }
+.stage table + table { margin-top: .5rem; }
