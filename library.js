@@ -115,6 +115,23 @@ const METHODS = [
     { t: 'Эмоциональная реакция: пульс (фотоплетизмография)', p: 'Оценка эмоционального возбуждения по пульсу. Как и кожно-гальваническая реакция (КГР), пульс меняется при волнении.', c: 'Палец прикладывается к камере и вспышке телефона. Пульс рассчитывается по изменению кровотока в коже. 30 секунд покоя, затем по 10 секунд показываются 3 нейтральных и 3 эмоциональных слова. Реакция = средний пульс на эмоциональных − на нейтральных словах.', i: '+5 уд/мин и более — высокая эмоциональная чувствительность, +2…+5 — обычная реакция, менее +2 — разницы почти нет. Не медицинский прибор, результаты ориентировочные.', s: 'Allen (2007) — фотоплетизмография; пульсовой вариант методики КГР' })
 ];
 
+/* Boshqa saytlardagi testlar — faqat havola (savollar o'sha saytning mulki) */
+const EXTERNAL_TESTS = [
+  { url: 'https://freudly.ai/ru/tests/test-iq/',
+    uz: { t: 'IQ testi (Freudly)', d: "70 ta topshiriq: naqshlar, sonlar, mantiq va xotira. Natija IQ ball va kognitiv profil ko'rinishida beriladi. Rus tilida, bepul, ~35–45 daqiqa." },
+    ru: { t: 'Тест IQ (Freudly)', d: '70 заданий: закономерности, числа, логика и память. Результат — балл IQ и когнитивный профиль. На русском, бесплатно, ~35–45 минут.' } }
+];
+window.externalTestsHtml = externalTestsHtml;
+function externalTestsHtml() {
+  return `<h2>${esc(lang === 'ru' ? 'Тесты на других сайтах' : 'Boshqa saytlardagi testlar')}</h2>
+    <div class="grid">${EXTERNAL_TESTS.map(x => `
+      <div class="card ext-test"><h3>${esc(x[lang].t)}</h3><p>${esc(x[lang].d)}</p>
+        <a class="btn" href="${x.url}" target="_blank" rel="noopener">${t('open')} ↗</a></div>`).join('')}</div>
+    <p class="meta">${esc(lang === 'ru'
+      ? 'Эти тесты проходят на сайте их владельцев; PsixoLab не отвечает за их содержание и методику, а результаты в ваш профиль не сохраняются.'
+      : "Bu testlar egasining saytida topshiriladi; PsixoLab ularning mazmuni va metodikasi uchun javob bermaydi, natijalar profilingizga saqlanmaydi.")}</p>`;
+}
+
 const OPEN_BOOKS = [
   { url: 'https://openstax.org/books/psychology-2e/pages/preface',
     uz: { t: 'Psychology 2e (OpenStax)', d: "Psixologiyaga kirish bo'yicha to'liq bepul darslik (ingliz tilida). CC BY 4.0 litsenziyasi ostida." },
@@ -183,6 +200,7 @@ function viewLibrary() {
     <h2>${esc(t('libMethods'))}</h2>${methods}
     <h2>${esc(t('libMine'))}</h2>${mine}
     <h2>${esc(t('libOpen'))}</h2><div class="grid">${books}</div>
+    ${externalTestsHtml()}
     <h2>${esc(t('libBiblio'))}</h2>
     <div class="card biblio">
       ${[['uz', 'bUz'], ['ru', 'bRu'], ['en', 'bEn']].map(([k, h]) => `<h3>${esc(t(h))}</h3><ol>${BIBLIO[k].map(b => `<li>${esc(b)}</li>`).join('')}</ol>`).join('')}

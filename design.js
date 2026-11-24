@@ -120,6 +120,7 @@
     _route();
     const pg = (location.hash || '#home').slice(1).split('/')[0] || 'home';
     document.body.dataset.page = pg;
+    if (pg === 'tests' && typeof externalTestsHtml === 'function' && !app.querySelector('.ext-test')) app.insertAdjacentHTML('beforeend', externalTestsHtml());
     if (pg === 'test') {
       const id = location.hash.split('/')[1];
       const d = dom(id);
