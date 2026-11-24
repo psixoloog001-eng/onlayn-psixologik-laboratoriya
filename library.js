@@ -14,8 +14,13 @@ const MATERIALS = [];
    2) VIDEO DARSLAR (YouTube)
    cat: 'guide' — saytdan foydalanish, 'lesson' — psixologiya darslari, 'practice' — amaliy mashqlar
    { cat: 'lesson', title: { uz: '...', ru: '...' }, url: 'https://www.youtube.com/watch?v=XXXXXXXXXXX' }
+   Saytning o'zida saqlanadigan video uchun url o'rniga: file: 'video/nomi.mp4', poster: 'video/nomi.jpg'
    ===================================================================== */
-const VIDEOS = [];
+const VIDEOS = [
+  { cat: 'lesson', file: 'video/haqorat-va-ichki-kuch.mp4', poster: 'video/haqorat-va-ichki-kuch.jpg', minutes: 3,
+    title: { uz: 'Haqorat va ichki kuch: imperator va tabib haqidagi rivoyat', ru: 'Оскорбление и внутренняя сила: притча об императоре и лекаре' },
+    desc: { uz: "Nega ba'zi so'zlar bizni og'ritadi, boshqalari esa yo'q? Rivoyat va undan uchta psixologik saboq. O'zbek tilida, ovozli.", ru: 'Почему одни слова нас ранят, а другие нет? Притча и три психологических вывода. На узбекском языке, с озвучкой.' } }
+];
 
 /* ---------- Tarjimalar ---------- */
 Object.assign(T.uz, {
@@ -213,12 +218,15 @@ function ytId(url) {
   return m ? m[1] : null;
 }
 function videoBlock(cat) {
-  const list = VIDEOS.filter(v => v.cat === cat && ytId(v.url));
+  const list = VIDEOS.filter(v => v.cat === cat && (v.file || ytId(v.url)));
   if (!list.length) return `<p class="meta">${esc(t('vidSoon'))}</p>`;
   return `<div class="video-grid">${list.map(v => `
     <div class="video-card">
-      <div class="video-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${ytId(v.url)}" title="${esc(v.title[lang] || v.title.uz)}" loading="lazy" allowfullscreen allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+      <div class="video-wrap">${v.file
+        ? `<video src="${esc(v.file)}" poster="${esc(v.poster || '')}" controls preload="none" playsinline></video>`
+        : `<iframe src="https://www.youtube-nocookie.com/embed/${ytId(v.url)}" title="${esc(v.title[lang] || v.title.uz)}" loading="lazy" allowfullscreen allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe>`}</div>
       <h3>${esc(v.title[lang] || v.title.uz)}</h3>
+      ${v.desc ? `<p>${esc(v.desc[lang] || v.desc.uz)}</p>` : ''}${v.minutes ? `<p class="meta">~${v.minutes} ${t('minutes')}</p>` : ''}
     </div>`).join('')}</div>`;
 }
 function viewVideos() {
@@ -281,9 +289,10 @@ style.textContent = `
 .lib-item p{margin:.5rem 0}
 .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
 .video-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.video-card h3{font-size:1rem;margin:.6rem .9rem .8rem}
+.video-card h3{font-size:1rem;margin:.8rem 1rem .4rem}
+.video-card p{margin:0 1rem .5rem;color:var(--muted);font-size:.93rem}.video-card p.meta{margin-bottom:1rem}
 .video-wrap{position:relative;aspect-ratio:16/9}
-.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-wrap iframe,.video-wrap video{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px;background:#16123F}
 .breath-stage{display:flex;flex-direction:column;align-items:center;gap:.8rem;padding:1rem 0}
 .breath-circle{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#91a7ff,#3b5bdb);display:flex;align-items:center;justify-content:center;transform:scale(.55);transition:transform 4s ease-in-out}
 .breath-circle span{color:#fff;font-size:2.4rem;font-weight:700}
