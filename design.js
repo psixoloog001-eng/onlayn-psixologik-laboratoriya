@@ -16,7 +16,7 @@
     body: { c: '#FF6F91', uz: 'Tana reaksiyasi', ru: 'Реакция тела', i: '<path d="M3 12h4l2-5 4 10 2-5h6"/>' }
   };
   const OF = {
-    phq9: 'mood', gad7: 'stress', pss10: 'stress', rosenberg: 'self', ipip: 'persona', logic: 'reason', accent: 'persona',
+    phq9: 'mood', gad7: 'stress', pss10: 'stress', rosenberg: 'self', ipip: 'persona', logic: 'reason', accent: 'persona', temper: 'persona',
     rt: 'speed', stroop: 'attention', span: 'memory', schulte: 'attention', gonogo: 'control', corsi: 'memory',
     nback: 'memory', flanker: 'attention', trail: 'control', words: 'memory', hanoi: 'control', pulse: 'body'
   };
