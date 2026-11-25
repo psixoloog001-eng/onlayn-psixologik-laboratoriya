@@ -13,12 +13,13 @@
     control: { c: '#7BE495', uz: 'Fikrlash va nazorat', ru: 'Мышление и контроль', i: '<path d="M4 18 9 8l4 6 3-4 4 8"/><circle cx="9" cy="8" r="1.6"/><circle cx="16" cy="10" r="1.6"/>' },
     speed: { c: '#FF9F5A', uz: 'Reaksiya tezligi', ru: 'Скорость реакции', i: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>' },
     reason: { c: '#8FD3FF', uz: 'Mantiqiy fikrlash', ru: 'Логическое мышление', i: '<path d="M9 3h6v4a2 2 0 1 0 0 4v4h-4a2 2 0 1 1-4 0H3V9h4a2 2 0 1 0 0-4V3z" transform="translate(2 3)"/>' },
+    nerve: { c: '#A3E635', uz: 'Asab tizimi', ru: 'Нервная система', i: '<circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6M5.6 5.6l4.3 4.3M14.1 14.1l4.3 4.3M5.6 18.4l4.3-4.3M14.1 9.9l4.3-4.3"/>' },
     body: { c: '#FF6F91', uz: 'Tana reaksiyasi', ru: 'Реакция тела', i: '<path d="M3 12h4l2-5 4 10 2-5h6"/>' }
   };
   const OF = {
     phq9: 'mood', gad7: 'stress', pss10: 'stress', rosenberg: 'self', ipip: 'persona', logic: 'reason', accent: 'persona', temper: 'persona',
     rt: 'speed', stroop: 'attention', span: 'memory', schulte: 'attention', gonogo: 'control', corsi: 'memory',
-    nback: 'memory', flanker: 'attention', trail: 'control', words: 'memory', hanoi: 'control', pulse: 'body'
+    nback: 'memory', flanker: 'attention', trail: 'control', words: 'memory', hanoi: 'control', pulse: 'body', tapping: 'nerve'
   };
   const dom = id => DOM[OF[id]] || DOM.persona;
   const icon = (d, size) => `<svg viewBox="0 0 24 24" width="${size || 24}" height="${size || 24}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d.i}</svg>`;
