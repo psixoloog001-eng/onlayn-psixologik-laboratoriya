@@ -5,7 +5,7 @@ const T = {
   uz: {
     brand: 'PsixoLab',
     navHome: 'Bosh sahifa', navTests: 'Testlar', navExp: 'Tajribalar', navResults: 'Natijalarim',
-    footer: "Natijalar sizning brauzeringizda saqlanadi; profilga kirgan bo'lsangiz — himoyalangan bulutda ham. Bu sayt tibbiy tashxis qo'ymaydi.",
+    footer: "Natijalar faqat sizning brauzeringizda saqlanadi va hech qayerga yuborilmaydi. Bu sayt tibbiy tashxis qo'ymaydi.",
     heroTitle: 'Onlayn psixologik laboratoriya',
     heroText: "Ilmiy asoslangan so'rovnomalar va kognitiv tajribalar yordamida o'zingizni sinab ko'ring. Bepul, ro'yxatdan o'tish shart emas.",
     important: 'Muhim',
@@ -43,7 +43,7 @@ const T = {
   ru: {
     brand: 'PsixoLab',
     navHome: 'Главная', navTests: 'Тесты', navExp: 'Эксперименты', navResults: 'Мои результаты',
-    footer: 'Результаты хранятся в вашем браузере, а если вы вошли в профиль — и в защищённом облаке. Сайт не ставит медицинских диагнозов.',
+    footer: 'Результаты хранятся только в вашем браузере и никуда не отправляются. Сайт не ставит медицинских диагнозов.',
     heroTitle: 'Онлайн психологическая лаборатория',
     heroText: 'Проверьте себя с помощью научно обоснованных опросников и когнитивных экспериментов. Бесплатно и без регистрации.',
     important: 'Важно',

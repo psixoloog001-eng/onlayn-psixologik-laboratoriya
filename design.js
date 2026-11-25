@@ -103,7 +103,7 @@
           <h1>${L("O'zingizni ilm bilan tanib oling", 'Узнайте себя с помощью науки')}</h1>
           <p class="hero-lead">${esc(L(`${nT} ta ilmiy so'rovnoma va ${nE} ta kognitiv tajriba: kayfiyat, stress, diqqat va xotirangizni o'lchang, keyin har kuni mashq qilib o'zgarishni kuzating.`, `${nT} научных опросников и ${nE} когнитивных экспериментов: измерьте настроение, стресс, внимание и память, а затем тренируйтесь каждый день и следите за изменениями.`))}</p>
           <div class="hero-cta"><a class="btn big" href="#tests">${L('Testni tanlash', 'Выбрать тест')}</a><a class="btn ghost big" href="#plan">${L('Rivojlanish xaritasi', 'Карта развития')}</a></div>
-          <p class="hero-note">${esc(L("Bepul. O'zbek va rus tillarida. Ro'yxatdan o'tish ixtiyoriy.", 'Бесплатно. На узбекском и русском. Регистрация по желанию.'))}</p>
+          <p class="hero-note">${esc(L("Bepul. O'zbek va rus tillarida. Ro'yxatdan o'tish shart emas.", 'Бесплатно. На узбекском и русском. Без регистрации.'))}</p>
         </div>
         <div class="hero-art">${inkblotSvg()}<p class="art-cap">${esc(L("Siz bu dog'da nimani ko'ryapsiz? Har kim har xil — psixologiya shundan boshlanadi.", 'Что вы видите в этой кляксе? Каждый своё — с этого и начинается психология.'))}</p></div>
       </section>

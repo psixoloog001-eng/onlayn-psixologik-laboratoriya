@@ -1,9 +1,8 @@
 /* PsixoLab — Rivojlanish xaritasi, kunlik vazifalar va ularning ijrosini tekshirish */
-import { getApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-const fbApp = getApp(), auth = getAuth(fbApp), db = getFirestore(fbApp);
+// Profil tizimi hozircha o'chirilgan: barcha ma'lumot faqat brauzerda saqlanadi.
+// Qayta yoqish uchun index.html ga auth.js ni qaytaring va bu yerda Firebase importlarini tiklang.
+const doc = () => null, setDoc = async () => {}, updateDoc = async () => {}, getDoc = async () => ({ exists: () => false }),
+  collection = () => null, getDocs = async () => ({ docs: [] }), db = null;
 let user = null, groupCode = null, cloudResults = null;
 const L = (uz, ru) => (lang === 'ru' ? ru : uz);
 const $ = id => document.getElementById(id);
@@ -181,7 +180,7 @@ function viewSetup() {
       <label class="card dirpick"><input type="checkbox" value="${k}" ${cur.includes(k) ? 'checked' : ''}><span class="dir-ic">${d.icon}</span><strong>${esc(d[lang])}</strong></label>`).join('')}</div>
     <p id="smsg" class="notice warn" hidden></p>
     <div class="row-actions"><button class="btn" id="sgo">${state.goals.length ? L('Saqlash', 'Сохранить') : L('Xaritani yaratish', 'Создать карту')}</button>${state.goals.length ? `<a class="btn secondary" href="#plan">${L('Bekor qilish', 'Отмена')}</a>` : ''}</div>
-    ${user ? '' : `<p class="meta">${esc(L("Maslahat: profilga kirsangiz, xaritangiz bulutda saqlanadi va telefon hamda kompyuterda bir xil bo'ladi.", 'Совет: войдите в профиль — карта сохранится в облаке и будет одинаковой на телефоне и компьютере.'))} <a href="#login">${L('Kirish', 'Войти')}</a></p>`}`;
+    <p class="meta">${esc(L("Xaritangiz shu brauzerda saqlanadi.", 'Карта сохраняется в этом браузере.'))}</p>`;
   $('sgo').onclick = () => {
     const g = [...app.querySelectorAll('.dirpick input:checked')].map(x => x.value);
     if (g.length < 1 || g.length > 4) { $('smsg').textContent = L("1 tadan 4 tagacha yo'nalish tanlang.", 'Выберите от 1 до 4 направлений.'); $('smsg').hidden = false; return; }
@@ -243,7 +242,7 @@ function viewPlan() {
     <h2>${L('Natijalar dinamikasi', 'Динамика результатов')}</h2>
     ${dynamicsHtml()}
     <div class="row-actions"><a class="btn secondary" href="#plan/setup">${L("Yo'nalishlarni o'zgartirish", 'Изменить направления')}</a></div>
-    <p class="meta">${esc(L("Kundalik yozuvlaringiz faqat sizga ko'rinadi. Guruh psixologi faqat vazifalar bajarilish statistikasini ko'radi.", 'Ваши записи видны только вам. Психолог группы видит лишь статистику выполнения заданий.'))}</p>`;
+    <p class="meta">${esc(L("Kundalik yozuvlaringiz faqat shu brauzerda saqlanadi va hech kimga yuborilmaydi.", 'Ваши записи хранятся только в этом браузере и никуда не отправляются.'))}</p>`;
   bindTasks(d);
 }
 
@@ -383,24 +382,4 @@ route = function () {
 window.addEventListener('hashchange', route);
 
 state = loadLocal() || { goals: [], days: {} };
-onAuthStateChanged(auth, async u => {
-  user = u; groupCode = null; cloudResults = null;
-  const anon = loadLocal('psixolab-plan');
-  state = loadLocal() || { goals: [], days: {} };
-  if (u) {
-    try {
-      const s = await getDoc(doc(db, 'users', u.uid, 'plan', 'main'));
-      if (s.exists()) { const c = s.data(); state = { goals: c.goals || state.goals, days: { ...state.days, ...(c.days || {}) } }; }
-    } catch (e) { /* oflayn */ }
-    if (anon && anon.goals) { // tizimga kirishdan oldingi ishlarni profilga qo'shish
-      if (!state.goals.length) state.goals = anon.goals;
-      for (const [k, d] of Object.entries(anon.days || {})) if (!state.days[k]) state.days[k] = d;
-      try { localStorage.removeItem('psixolab-plan'); } catch (e) { /* ignore */ }
-    }
-    try { const p = await getDoc(doc(db, 'users', u.uid)); groupCode = p.exists() ? p.data().groupCode || null : null; } catch (e) { /* ignore */ }
-    try { cloudResults = (await getDocs(collection(db, 'users', u.uid, 'results'))).docs.map(x => x.data()); } catch (e) { cloudResults = null; }
-    if (state.goals.length) { save(); syncGroup(); }
-  }
-  if (['plan', 'home'].includes(page())) route();
-});
 route();
