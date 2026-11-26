@@ -20,7 +20,7 @@
   const OF = {
     phq9: 'mood', gad7: 'stress', pss10: 'stress', rosenberg: 'self', ipip: 'persona', logic: 'reason', accent: 'persona', temper: 'persona', pf16: 'persona', belov: 'persona',
     rt: 'speed', stroop: 'attention', span: 'memory', schulte: 'attention', gonogo: 'control', corsi: 'memory',
-    nback: 'memory', flanker: 'attention', trail: 'control', words: 'memory', hanoi: 'control', pulse: 'body', tapping: 'nerve', lifewheel: 'persona', qob_ped: 'ability', qob_kom: 'ability', qob_psy: 'ability', qob_ijod: 'ability'
+    nback: 'memory', flanker: 'attention', trail: 'control', words: 'memory', hanoi: 'control', pulse: 'body', tapping: 'nerve', lifewheel: 'persona', qob_all: 'ability', qob_ped: 'ability', qob_kom: 'ability', qob_psy: 'ability', qob_ijod: 'ability'
   };
   const dom = id => DOM[OF[id]] || DOM.persona;
   const icon = (d, size) => `<svg viewBox="0 0 24 24" width="${size || 24}" height="${size || 24}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d.i}</svg>`;

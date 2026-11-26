@@ -309,6 +309,24 @@
     for (let k = 0; k < max; k++) d.sc.forEach(s => { const it = SC[s].it[k]; if (it) out.push([it[0], it[1], s, it[2]]); });
     return out;
   }
+  // ---------- To'liq batareya: 4 qobiliyat bitta testda ----------
+  const ALL_SC = ['lrn', 'fair', 'lea', 'scf', 'soc', 'si', 'kin', 'ori', 'cur'];
+  const ALL_SJ = ['ped', 'kom', 'psy'];
+  const ALL_AB = ['qob_ped', 'qob_kom', 'qob_psy', 'qob_ijod'];
+  const ALLNAME = ['Qobiliyatlar diagnostikasi (to\'liq)', 'Диагностика способностей (полная)'];
+  function allItems() {
+    const out = [], max = Math.max(...ALL_SC.map(s => SC[s].it.length));
+    for (let k = 0; k < max; k++) ALL_SC.forEach(s => { const it = SC[s].it[k]; if (it) out.push([it[0], it[1], s, it[2]]); });
+    return out;
+  }
+  {
+    const it = allItems();
+    TESTS.qob_all = { name: { uz: ALLNAME[0], ru: ALLNAME[1] },
+      desc: { uz: "Pedagogik, kommunikativ-tashkilotchilik, psixologik (konsultantlik) va ijodiy qobiliyatlaringizni bitta testda aniqlaydi va ularni o'zaro solishtirib, sizga eng mos yo'nalishni ko'rsatadi.", ru: 'Определяет педагогические, коммуникативно-организаторские, психологические (консультативные) и творческие способности в одном тесте, сравнивает их и показывает наиболее подходящее направление.' },
+      instr: { uz: '', ru: '' }, minutes: 30,
+      items: { uz: it.map(x => x[0]).concat(...ALL_SJ.map(k => SJ[k].map(x => x[0])), AUT.map(x => x.o[0])), ru: it.map(x => x[1]).concat(...ALL_SJ.map(k => SJ[k].map(x => x[1])), AUT.map(x => x.o[1])) },
+      options: { uz: OPTS(), ru: OPTS() }, bands: [], reverse: [], source: 'IPIP (ipip.ori.org) + PsixoLab' };
+  }
   Object.entries(DEF).forEach(([id, d]) => {
     const it = itemsOf(id);
     TESTS[id] = { name: { uz: d.name[0], ru: d.name[1] }, desc: { uz: d.desc[0], ru: d.desc[1] }, instr: { uz: '', ru: '' }, minutes: d.min,
@@ -357,9 +375,9 @@
   function autTask(n) {
     const a = AUT[n]; let left = AUT_SEC;
     app.innerHTML = `
-      <h1>${esc(DEF[S.id].name[lang === 'ru' ? 1 : 0])}</h1>
+      <h1>${esc((S.all ? ALLNAME : DEF[S.id].name)[lang === 'ru' ? 1 : 0])}</h1>
       <div class="card">
-        <p class="meta">${L('2-qism: ijodiy topshiriq', 'Часть 2: творческое задание')} · ${n + 1}/${AUT.length}</p>
+        <p class="meta">${S.all ? L('Ijodiy topshiriq', 'Творческое задание') : L('2-qism: ijodiy topshiriq', 'Часть 2: творческое задание')} · ${n + 1}/${AUT.length}</p>
         <h2>${esc(L(`«${a.o[0]}»ni qanday maqsadlarda ishlatish mumkin?`, `Как можно использовать предмет «${a.o[1]}»?`))}</h2>
         <p>${esc(L(`${AUT_SEC / 60} daqiqa ichida iloji boricha ko'p va turli xil, odatiy bo'lmagan qo'llanish usullarini yozing — har bir g'oyani yangi qatorga. G'oya qanchalik g'ayrioddiy bo'lsa, shuncha yaxshi.`, `За ${AUT_SEC / 60} минуты напишите как можно больше разных, необычных способов применения — каждую идею с новой строки. Чем необычнее идея, тем лучше.`))}</p>
         <div class="qb-aut-top"><span id="acnt">0 ${L("ta g'oya", 'идей')}</span><span class="qb-timer" id="atime">${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}</span></div>
@@ -374,7 +392,7 @@
       const list = ideas();
       const orig = list.filter(s => !a.common.some(c => s.includes(c))).length;
       S.aut[n] = { n: list.length, orig, list: list.slice(0, 40) };
-      if (n + 1 < AUT.length) autTask(n + 1); else finish();
+      if (n + 1 < AUT.length) autTask(n + 1); else (S.all ? finishAll() : finish());
     };
     const iv = setInterval(() => {
       if (!$('aut')) { clearInterval(iv); return; }
@@ -436,8 +454,110 @@
     return `<details class="qb-rev"><summary>${L("G'oyalaringiz", 'Ваши идеи')}</summary>${S.aut.map((x, i) => `<p><b>${esc(AUT[i].o[lang === 'ru' ? 1 : 0])}</b> (${x.n}): ${esc(x.list.join('; ') || '—')}</p>`).join('')}</details>`;
   }
 
+  // ===== To'liq batareya =====
+  const PER = 21;
+  function viewAll() {
+    const items = allItems();
+    S = { all: true, id: 'qob_all', t0: Date.now(), likert: Array(items.length).fill(0), sjOrd: {}, sjAns: {}, aut: [], page: 0 };
+    ALL_SJ.forEach(k => { S.sjOrd[k] = SJ[k].map(() => shuffle([0, 1, 2, 3])); S.sjAns[k] = Array(SJ[k].length).fill(-1); });
+    allPage();
+  }
+  function allPages() { const n = Math.ceil(allItems().length / PER); return { lik: n, total: n + ALL_SJ.length + 1 }; }
+  function allPage() {
+    const items = allItems(), P = allPages(), p = S.page, opts = OPTS(), Rr = lang === 'ru' ? 1 : 0;
+    const head = `<a href="#tests">← ${t('back')}</a><h1>${esc(ALLNAME[Rr])}</h1>
+      <div class="pf-top"><span>${L('Bosqich', 'Этап')} ${p + 1} / ${P.total}</span><span>${p < P.lik ? L("O'zini baholash", 'Самооценка') : p < P.lik + ALL_SJ.length ? L('Amaliy vaziyatlar', 'Практические ситуации') : L('Ijodiy topshiriq', 'Творческое задание')}</span></div>
+      <div class="progress"><div style="width:${p / P.total * 100}%"></div></div>`;
+    let body = '', keys = [];
+    if (p < P.lik) {
+      const from = p * PER, to = Math.min(items.length, from + PER);
+      body = (p === 0 ? `<p><strong>${t('instructionPrefix')}</strong> ${esc(L(`Test 3 qismdan iborat: (1) ${items.length} ta fikr bo'yicha o'zini baholash, (2) ${ALL_SJ.reduce((a, k) => a + SJ[k].length, 0)} ta real vaziyat, (3) 4 daqiqalik ijodiy topshiriq. Jami taxminan 30 daqiqa. Odatda qanday ekanligingizni baholang, uzoq o'ylamang.`, `Тест из 3 частей: (1) самооценка по ${items.length} утверждениям, (2) ${ALL_SJ.reduce((a, k) => a + SJ[k].length, 0)} реальных ситуаций, (3) творческое задание на 4 минуты. Всего около 30 минут. Оценивайте, какой вы обычно, не раздумывайте долго.`))}</p>` : '') +
+        items.slice(from, to).map((it, k) => { const i = from + k; keys.push('l' + i); return `<div class="question" data-k="l${i}"><p>${i + 1}. ${esc(it[Rr])}</p>
+          <div class="options">${opts.map((o, v) => `<label><input type="radio" name="l${i}" value="${v + 1}" ${S.likert[i] === v + 1 ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div></div>`; }).join('');
+    } else if (p < P.lik + ALL_SJ.length) {
+      const k = ALL_SJ[p - P.lik], d = DEF['qob_' + k];
+      body = `<h2 class="qb-part">${esc(d.sjn[Rr])}</h2><p class="meta">${esc(L("Har bir vaziyatda siz eng to'g'ri deb hisoblagan bitta javobni tanlang.", 'В каждой ситуации выберите один ответ, который считаете наилучшим.'))}</p>` +
+        SJ[k].map((q, i) => { keys.push(`s${k}${i}`); return `<div class="question qb-sj" data-k="s${k}${i}"><p><b>${i + 1}.</b> ${esc(q[Rr])}</p>
+          <div class="qb-opts">${S.sjOrd[k][i].map((oi, j) => `<label><input type="radio" name="s${k}${i}" value="${oi}" ${S.sjAns[k][i] === oi ? 'checked' : ''}><span class="qb-l">${'ABCD'[j]}</span><span>${esc(q[2][oi][Rr])}</span></label>`).join('')}</div></div>`; }).join('');
+    } else {
+      app.innerHTML = head + `<div class="card"><h2>${L('Ijodiy topshiriq', 'Творческое задание')}</h2><p>${esc(L(`Keyingi ikki ekranda har biriga ${AUT_SEC / 60} daqiqa beriladi: berilgan narsaning iloji boricha ko'p va g'ayrioddiy qo'llanish usullarini yozasiz. Taymer "Boshlash"ni bosganingizda ishga tushadi.`, `На следующих двух экранах по ${AUT_SEC / 60} минуты: нужно написать как можно больше необычных способов применения предмета. Таймер запустится после нажатия «Начать».`))}</p>
+        <div class="row-actions"><button class="btn secondary" id="aprev">← ${L('Oldingi', 'Назад')}</button><button class="btn" id="ago">${L('Boshlash', 'Начать')}</button></div></div>`;
+      $('aprev').addEventListener('click', () => { S.page--; allPage(); window.scrollTo(0, 0); });
+      $('ago').addEventListener('click', () => autTask(0));
+      window.scrollTo(0, 0); return;
+    }
+    app.innerHTML = head + `<form id="aform">${body}<p id="aerr" class="notice danger" hidden>${esc(t('answerAll'))}</p>
+      <div class="row-actions">${p > 0 ? `<button class="btn secondary" type="button" id="aprev">← ${L('Oldingi', 'Назад')}</button>` : ''}<button class="btn" type="submit">${L('Keyingi', 'Далее')} →</button></div></form>
+      ${p === 0 ? `<p class="meta">${esc(L("O'zini baholash qismi: International Personality Item Pool (ipip.ori.org) ochiq shkalalari, PsixoLab tarjimasi. Vaziyatlar va ijodiy topshiriq PsixoLab tomonidan tuzilgan.", 'Самооценка: открытые шкалы International Personality Item Pool (ipip.ori.org), перевод PsixoLab. Ситуации и творческое задание составлены PsixoLab.'))}</p>` : ''}`;
+    const form = $('aform');
+    const store = () => keys.forEach(k => { const c = form.querySelector(`input[name=${k}]:checked`); if (!c) return; if (k[0] === 'l') S.likert[+k.slice(1)] = +c.value; else { const set = ALL_SJ.find(x => k.startsWith('s' + x)); S.sjAns[set][+k.slice(1 + set.length)] = +c.value; } });
+    form.addEventListener('change', e => { const q = e.target.closest('.question'); if (q) q.classList.remove('miss'); });
+    form.addEventListener('submit', ev => {
+      ev.preventDefault(); store();
+      const miss = keys.filter(k => !form.querySelector(`input[name=${k}]:checked`));
+      if (miss.length) { $('aerr').hidden = false; miss.forEach(k => form.querySelector(`.question[data-k="${k}"]`).classList.add('miss')); form.querySelector(`.question[data-k="${miss[0]}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      S.page++; allPage(); window.scrollTo(0, 0);
+    });
+    if ($('aprev')) $('aprev').addEventListener('click', () => { store(); S.page--; allPage(); window.scrollTo(0, 0); });
+  }
+
+  function autScore(aut) {
+    const tot = aut.reduce((a, b) => a + b.n, 0), orig = aut.reduce((a, b) => a + b.orig, 0), per = tot / AUT.length;
+    return { p: Math.max(0, Math.min(100, Math.round(per / 14 * 85 + (tot ? orig / tot * 15 : 0)))), pd: { tot, orig, per: Math.round(per * 10) / 10 } };
+  }
+  function finishAll() {
+    const items = allItems(), sec = Math.round((Date.now() - S.t0) / 1000);
+    const sp = {}; ALL_SC.forEach(s => { let sum = 0, n = 0; items.forEach((it, i) => { if (it[2] === s) { sum += it[3] > 0 ? S.likert[i] : 6 - S.likert[i]; n++; } }); sp[s] = Math.round((sum / n - 1) / 4 * 100); });
+    const flags = []; if (new Set(S.likert).size === 1) flags.push('same'); if (sec < items.length * 2 + 240) flags.push('fast');
+    const ab = {};
+    ALL_AB.forEach(id => {
+      const d = DEF[id], self = Math.round(d.sc.reduce((a, s) => a + sp[s], 0) / d.sc.length);
+      let prac, pd;
+      if (d.sj) { const ok = S.sjAns[d.sj].filter((a, i) => a === SJ[d.sj][i][3]).length; prac = Math.round(ok / SJ[d.sj].length * 100); pd = { ok, n: SJ[d.sj].length }; }
+      else { const a = autScore(S.aut); prac = a.p; pd = a.pd; }
+      ab[id] = { index: Math.round(self * 0.5 + prac * 0.5), self, prac, pd, sc: d.sc.map(s => [s, sp[s]]) };
+      saveResult({ type: 'test', id, ...ab[id], valid: flags.length ? 0 : 1, flags: flags.join(','), time: sec, fromAll: 1 });
+    });
+    saveResult({ type: 'test', id: 'qob_all', ab: Object.fromEntries(ALL_AB.map(id => [id, ab[id].index])), valid: flags.length ? 0 : 1, flags: flags.join(','), time: sec });
+    S.done = true;
+    showAll(ab, sp, flags);
+  }
+  function showAll(ab, sp, flags) {
+    const Rr = lang === 'ru' ? 1 : 0, ord = ALL_AB.slice().sort((a, b) => ab[b].index - ab[a].index), top = ord[0], low = ord[ord.length - 1];
+    const COL = { qob_ped: '#5B47E0', qob_kom: '#F5A524', qob_psy: '#2BA88F', qob_ijod: '#FF6F91' };
+    const second = ord[1], close = ab[top].index - ab[second].index <= 5;
+    const bar = (name, p, extra, col) => `<div class="qb-row"><span>${esc(name)}</span><div class="qb-bar"><i style="width:${Math.max(2, p)}%;background:${col || 'var(--accent)'}"></i></div><b>${p}%</b><em>${esc(extra || lvName(lv(p)))}</em></div>`;
+    app.innerHTML = `
+      <h1>${esc(ALLNAME[Rr])}</h1>
+      ${flags.length ? `<div class="notice warn">${esc(L("Javoblar juda tez yoki bir xil berilgan — natija ishonchsiz bo'lishi mumkin.", 'Ответы даны слишком быстро или одинаково — результат может быть недостоверным.'))}</div>` : ''}
+      <div class="card">
+        <h2>${L('Qobiliyatlar profili', 'Профиль способностей')}</h2>
+        <div class="qa-grid">${ord.map((id, i) => `<div class="qa-card ${i === 0 ? 'qa-first' : ''}" style="--c:${COL[id]}"><span class="qa-rank">${i + 1}</span><b>${ab[id].index}</b><span>${esc(DEF[id].name[Rr])}</span><em>${esc(lvName(lv(ab[id].index)))}</em></div>`).join('')}</div>
+        <p class="meta">${L("Indeks (0–100) — o'zini baholash va amaliy qism natijalarining o'rtachasi.", 'Индекс (0–100) — среднее самооценки и практической части.')}</p>
+      </div>
+      <div class="conclusion">
+        <h2>${L('Xulosa', 'Заключение')}</h2>
+        <p>${close
+          ? esc(L(`Sizda ikki qobiliyat deyarli teng darajada kuchli: «${DEF[top].name[0]}» (${ab[top].index}) va «${DEF[second].name[0]}» (${ab[second].index}). Bu ikkala yo'nalishni birlashtiradigan kasblar sizga ayniqsa mos keladi.`, `У вас почти одинаково сильны две способности: «${DEF[top].name[1]}» (${ab[top].index}) и «${DEF[second].name[1]}» (${ab[second].index}). Вам особенно подойдут профессии, объединяющие оба направления.`))
+          : esc(L(`Eng kuchli qobiliyatingiz — «${DEF[top].name[0]}» (${ab[top].index}/100, ${lvName(lv(ab[top].index))}).`, `Ваша самая сильная способность — «${DEF[top].name[1]}» (${ab[top].index}/100, ${lvName(lv(ab[top].index))}).`))}</p>
+        <p>${esc((lv(ab[top].index) >= 3 ? DEF[top].hi : lv(ab[top].index) === 2 ? DEF[top].mid : DEF[top].lo)[Rr])}</p>
+        <p><b>${L('Mos sohalar', 'Подходящие сферы')}:</b> ${esc(DEF[top].job[Rr])}${close ? ' ' + esc(DEF[second].job[Rr]) : ''}</p>
+        ${ab[low].index < 50 ? `<p><b>${L('Rivojlantirish kerak', 'Стоит развивать')} — ${esc(DEF[low].name[Rr])} (${ab[low].index}):</b> ${esc(DEF[low].tip[Rr])}</p>` : ''}
+        <p class="meta">${esc(L("O'zini baholash shkalalari xalqaro tadqiqotlarda ishonchliligi tekshirilgan IPIP shkalalari (Kronbax alfasi 0,70–0,87). O'zbek normalari hali yo'q, darajalar taxminiy; amaliy qism ishonchliligi ma'lumot to'plangach hisoblanadi. Natija kasb tanlash bo'yicha yakuniy qaror emas.", 'Шкалы самооценки — шкалы IPIP с проверенной надёжностью (альфа Кронбаха 0,70–0,87). Узбекских норм пока нет, уровни ориентировочные; надёжность практической части будет рассчитана по накопленным данным. Результат не является окончательным решением о выборе профессии.'))}</p>
+      </div>
+      ${ord.map(id => { const a = ab[id], d = DEF[id]; return `<details class="card qa-det"><summary><b>${esc(d.name[Rr])}</b> — ${a.index}/100</summary>
+        ${a.sc.map(([s, p]) => bar(SC[s].n[Rr], p)).join('')}
+        ${bar(d.sjn[Rr], a.prac, d.sj ? L(`${a.pd.ok}/${a.pd.n} to'g'ri`, `${a.pd.ok}/${a.pd.n} верно`) : L(`${a.pd.tot} ta g'oya`, `${a.pd.tot} идей`), '#2BA88F')}
+        <p>${esc((lv(a.index) >= 3 ? d.hi : lv(a.index) === 2 ? d.mid : d.lo)[Rr])}</p>
+        ${d.sj ? `<ol class="qa-rev">${SJ[d.sj].map((q, i) => { const ans = S.sjAns[d.sj][i], ok = ans === q[3]; return ok ? '' : `<li><b>✗</b> ${esc(q[Rr])}<br><small>${L('Tavsiya etiladigan javob', 'Рекомендуемый ответ')}: ${esc(q[2][q[3]][Rr])}</small></li>`; }).join('')}</ol>` : ''}
+      </details>`; }).join('')}
+      <div class="row-actions"><a class="btn" href="#xulosa">${L('Umumiy xulosaga o\'tish', 'К общему заключению')}</a><a class="btn secondary" href="#test/qob_all" onclick="setTimeout(route,0)">${t('retake')}</a><button class="btn secondary" onclick="window.print()">${L('Chop etish / PDF', 'Печать / PDF')}</button></div>`;
+    window.scrollTo(0, 0);
+  }
+
   const _desc = describe;
   describe = function (r) {
+    if (r.type === 'test' && r.id === 'qob_all' && r.ab) return { name: ALLNAME[lang === 'ru' ? 1 : 0], result: Object.entries(r.ab).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${DEF[k].name[lang === 'ru' ? 1 : 0].split(' ')[0]} ${v}`).join(', '), note: '' };
     if (r.type === 'test' && DEF[r.id] && r.index != null) return { name: DEF[r.id].name[lang === 'ru' ? 1 : 0], result: `${r.index}/100`, note: `${lvName(lv(r.index))} · ${L("o'zini baholash", 'самооценка')} ${r.self}%, ${L('amaliy', 'практика')} ${r.prac}%` };
     return _desc(r);
   };
@@ -464,6 +584,14 @@
   .qb-row b{font-family:var(--display)}.qb-row em{font-style:normal;color:var(--muted);font-size:.82rem}
   .qb-bar{height:14px;border-radius:7px;background:#EEEAFB;overflow:hidden}.qb-bar i{display:block;height:100%;border-radius:7px}
   .qb-rev{margin:1rem 0}.qb-rev summary{cursor:pointer;font-weight:700}.qb-rev li{margin:.5rem 0;line-height:1.4}.qb-rev li.ok b{color:#1F9D7A}.qb-rev li.bad b{color:#E0466B}.qb-rev small{color:#625D8F}
+  .pf-top{display:flex;justify-content:space-between;font-weight:600;color:var(--muted);margin:.8rem 0 .3rem}
+  .qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin:.6rem 0}
+  .qa-card{position:relative;border:2px solid var(--border);border-top:6px solid var(--c);border-radius:14px;padding:1rem .8rem;display:flex;flex-direction:column;gap:.2rem;color:var(--text);background:#fff}
+  .qa-card.qa-first{box-shadow:0 10px 30px -12px var(--c);border-color:var(--c)}
+  .qa-card b{font:800 2.2rem/1 var(--display);color:var(--c)}.qa-card span{font-weight:700;font-size:.9rem}.qa-card em{font-style:normal;color:var(--muted);font-size:.82rem}
+  .qa-rank{position:absolute;top:.5rem;right:.7rem;color:var(--muted)!important;font-size:.8rem!important}
+  .qa-det{margin:.8rem 0}.qa-det summary{cursor:pointer;font-size:1.02rem;color:var(--text)}.qa-rev{margin-top:.6rem}.qa-rev li{margin:.4rem 0}.qa-rev li b{color:#E0466B}.qa-rev small{color:#625D8F}
+  @media (max-width:700px){.qa-grid{grid-template-columns:1fr 1fr}}
   @media (max-width:700px){.card.qb-res{flex-direction:column;align-items:stretch}.qb-index{margin:0 auto}.qb-row{grid-template-columns:1fr 46px}.qb-row .qb-bar{grid-column:1/3;grid-row:2}.qb-row em{grid-column:1/3}}`;
   document.head.appendChild(css);
 
@@ -473,6 +601,7 @@
     _route();
     const [pg, arg] = (location.hash || '#home').slice(1).split('/');
     if (pg === 'test' && DEF[arg]) { view(arg); window.scrollTo(0, 0); }
+    else if (pg === 'test' && arg === 'qob_all') { viewAll(); window.scrollTo(0, 0); }
   };
   window.addEventListener('hashchange', route);
   route();
