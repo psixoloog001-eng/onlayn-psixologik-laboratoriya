@@ -58,22 +58,25 @@
       <div class="card">
         <p>${esc(L(`Testda ${COUNT} ta savol bo'ladi, ular ${e.qs.length} ta savollik bazadan barcha mavzular bo'yicha mutanosib ravishda tasodifiy tanlanadi. Har bir savolda 4 ta javob varianti bor, faqat bittasi to'g'ri. Vaqt — ${MINUTES} daqiqa; vaqt tugasa, test avtomatik yakunlanadi. Savollar orasida bemalol oldinga-orqaga o'tishingiz mumkin.`, `В тесте ${COUNT} вопросов, они случайно выбираются из базы в ${e.qs.length} вопросов пропорционально по всем темам. В каждом вопросе 4 варианта, верный только один. Время — ${MINUTES} минут; по истечении тест завершится автоматически. Между вопросами можно свободно переходить.`))}</p>
         <label class="exam-f">${L('Ism va familiya', 'Имя и фамилия')}<input id="xname" maxlength="80" value="${esc(me.n || '')}" autocomplete="name"></label>
-        <label class="exam-f">${L('Guruh (ixtiyoriy)', 'Группа (необязательно)')}<input id="xgroup" maxlength="40" value="${esc(me.g || '')}"></label>
+        <label class="exam-f">${L('Guruh', 'Группа')}<input id="xgroup" maxlength="30" placeholder="${L('masalan: PS-21', 'например: PS-21')}" value="${esc(me.g || '')}"></label>
         <div class="notice warn exam-rules"><strong>${L('Test qoidalari', 'Правила теста')}:</strong>
           <ul>
             <li>${L("Test davomida boshqa ilova, oyna yoki sahifaga o'tmang — har bir chiqish qayd etiladi va natijada ko'rsatiladi.", 'Во время теста не переходите в другие приложения, окна или вкладки — каждый выход фиксируется и отображается в результате.')}</li>
             <li>${L(`${MAX_LEAVES}-marta chiqqaningizda test avtomatik yakunlanadi.`, `При ${MAX_LEAVES}-м выходе тест завершится автоматически.`)}</li>
             <li>${L("Kompyuterda test to'liq ekranda ochiladi; undan chiqish ham chiqish hisoblanadi.", 'На компьютере тест открывается во весь экран; выход из него тоже считается выходом.')}</li>
             <li>${L('Savollarni nusxalash va belgilash o\'chirilgan.', 'Копирование и выделение вопросов отключены.')}</li>
+            <li>${L("Natijangiz (ism-familiya, guruh, javoblar va testdan chiqishlar soni) o'qituvchiga yuboriladi.", 'Ваш результат (ФИО, группа, ответы и число выходов из теста) отправляется преподавателю.')}</li>
           </ul></div>
-        <p id="xerr" class="notice danger" hidden>${L('Ism va familiyangizni kiriting.', 'Введите имя и фамилию.')}</p>
+        <p id="xerr" class="notice danger" hidden>${L('Ism-familiya va guruhingizni kiriting.', 'Введите имя, фамилию и группу.')}</p>
         <div class="row-actions"><button class="btn big" id="xgo">${L('Testni boshlash', 'Начать тест')}</button></div>
       </div>`;
     $('xgo').addEventListener('click', () => {
-      const n = $('xname').value.trim(), g = $('xgroup').value.trim();
-      if (n.length < 3) { $('xerr').hidden = false; $('xname').focus(); return; }
+      const n = $('xname').value.trim().replace(/\s+/g, ' '), g = $('xgroup').value.trim().toUpperCase().replace(/\s+/g, '');
+      if (n.length < 3 || !n.includes(' ')) { $('xerr').hidden = false; $('xname').focus(); return; }
+      if (!g) { $('xerr').hidden = false; $('xgroup').focus(); return; }
       try { localStorage.setItem('psixolab-exam-me', JSON.stringify({ n, g })); } catch (x) {}
-      run = { id, name: n, group: g, items: pick(e), ans: [], cur: 0, t0: Date.now(), done: false, leaves: 0, away: 0, awayStart: 0 };
+      const rid = Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(9)), b => (b % 36).toString(36)).join('');
+      run = { rid, id, name: n, group: g, items: pick(e), ans: [], cur: 0, t0: Date.now(), done: false, leaves: 0, away: 0, awayStart: 0 };
       goFull();
       run.ans = Array(run.items.length).fill(-1);
       saveRun(run); viewQ();
@@ -136,7 +139,11 @@
     const score = ok.filter(Boolean).length, pct = Math.round(score / n * 100), sec = Math.min(MINUTES * 60, Math.round((Date.now() - run.t0) / 1000));
     run.done = true; clearRun();
     saveResult({ type: 'exam', id: run.id, name: run.name, group: run.group, value: score, max: n, pct, time: sec, q: run.items.map((it, k) => [it.i, run.ans[k]]), leaves: run.leaves || 0, away: Math.round((run.away || 0) / 1000), ended: reason || '' });
+    const payload = { rid: run.rid || ('r' + Date.now().toString(36)), exam: run.id, title: e.title, name: run.name, group: run.group || '', score, max: n, pct, grade: +grade(pct)[0], time: sec, leaves: run.leaves || 0, away: Math.round((run.away || 0) / 1000), ended: reason || '', q: run.items.map(it => it.i), a: run.items.map((it, k) => run.ans[k]), started: run.t0 };
+    try { const Q = JSON.parse(localStorage.getItem('psixolab-exam-queue') || '[]'); Q.push(payload); localStorage.setItem('psixolab-exam-queue', JSON.stringify(Q)); } catch (x) {}
+    run.rid = payload.rid;
     showResult(run, ok, score, pct, sec, reason);
+    if (window.PL_examFlush) window.PL_examFlush();
   }
 
   function showResult(r, ok, score, pct, sec, reason) {
@@ -152,6 +159,7 @@
         <div>
           <p class="exam-who"><strong>${esc(r.name)}</strong>${r.group ? ` · ${esc(r.group)}` : ''}</p>
           <div class="score">${score} / ${n} <small>(${pct}%)</small></div>
+          <p class="exam-send" id="xsend" data-rid="${esc(r.rid || '')}">⏳ ${L("Natija o'qituvchiga yuborilmoqda…", 'Результат отправляется преподавателю…')}</p>
           <p class="exam-integrity ${r.leaves ? 'bad' : 'ok'}">${r.leaves ? L(`Testdan chiqishlar: ${r.leaves} marta, jami ${Math.round((r.away || 0) / 1000)} soniya`, `Выходы из теста: ${r.leaves}, всего ${Math.round((r.away || 0) / 1000)} сек`) : L("Testdan chiqilmagan ✓", 'Выходов из теста не было ✓')}</p>
           <p class="meta">${d.toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uz-UZ')} ${d.toLocaleTimeString(lang === 'ru' ? 'ru-RU' : 'uz-UZ', { hour: '2-digit', minute: '2-digit' })} · ${L('sarflangan vaqt', 'затрачено')} ${fmt(sec)}</p>
           <p class="meta">${L("Baholash: 86% va yuqori — 5, 71–85% — 4, 55–70% — 3, 55% dan past — 2.", 'Шкала: от 86% — 5, 71–85% — 4, 55–70% — 3, ниже 55% — 2.')}</p>
@@ -269,6 +277,7 @@
   .exam-warn-box{background:#fff;color:#1E1A4D;border-radius:18px;padding:1.5rem;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
   .exam-warn-box b{font:800 1.3rem var(--display);color:#E0466B}
   .exam-rules ul{margin:.4rem 0 0;padding-left:1.1rem}.exam-rules li{margin:.2rem 0}
+  .exam-send{font-weight:700;margin:.2rem 0;color:var(--muted)}.exam-send.ok{color:#1F9D7A}.exam-send.err{color:#D98E04}
   .exam-integrity{font-weight:700;margin:.3rem 0}.exam-integrity.ok{color:#1F9D7A}.exam-integrity.bad{color:#E0466B}
   @media print{header,footer,.row-actions,nav{display:none!important}.exam-rv{break-inside:avoid}.exam-guard{display:none!important}}`;
   document.head.appendChild(css);

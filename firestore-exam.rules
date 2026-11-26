@@ -1,0 +1,18 @@
+    // ===== Bilim testlari natijalari (PsixoLab) =====
+    match /examResults/{rid} {
+      // Talaba (ro'yxatdan o'tmagan) faqat yangi natija yarata oladi, o'qiy olmaydi va o'zgartira olmaydi
+      allow create: if rid.size() <= 40
+        && request.resource.data.keys().hasOnly(['exam','title','name','group','score','max','pct','grade','time','leaves','away','ended','q','a','started','at'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 2 && request.resource.data.name.size() <= 80
+        && request.resource.data.group is string && request.resource.data.group.size() <= 30
+        && request.resource.data.exam is string && request.resource.data.exam.size() <= 40
+        && request.resource.data.score is int && request.resource.data.max is int
+        && request.resource.data.score >= 0 && request.resource.data.score <= request.resource.data.max && request.resource.data.max <= 100
+        && request.resource.data.q is list && request.resource.data.q.size() <= 100
+        && request.resource.data.a is list && request.resource.data.a.size() <= 100
+        && request.resource.data.at == request.time;
+      // Ko'rish va o'chirish — faqat o'qituvchi (tasdiqlangan email bilan)
+      allow read, delete: if request.auth != null
+        && request.auth.token.email == 'javoxirshermatov94@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
