@@ -3,7 +3,7 @@
 (function () {
   const L = (uz, ru) => (lang === 'ru' ? ru : uz);
   const $ = id => document.getElementById(id);
-  const COUNT = 30, MINUTES = 30, KEY = 'psixolab-exam-run';
+  const COUNT = 30, MINUTES = 30, KEY = 'psixolab-exam-run', MAX_LEAVES = 3;
   const EX = window.EXAMS || {};
 
   Object.assign(T.uz, { navExams: 'Bilim testlari' });
@@ -50,7 +50,7 @@
   function viewStart(id) {
     const e = EX[id]; if (!e) { location.hash = '#exams'; return; }
     const prev = loadRun();
-    if (prev && prev.id === id && !prev.done) { run = prev; viewQ(); return; }
+    if (prev && prev.id === id && !prev.done) { run = prev; viewQ(); if (run.awayStart) leaveEnd(true); return; }
     let me = {}; try { me = JSON.parse(localStorage.getItem('psixolab-exam-me')) || {}; } catch (x) {}
     app.innerHTML = `
       <a href="#exams">← ${t('back')}</a>
@@ -59,6 +59,13 @@
         <p>${esc(L(`Testda ${COUNT} ta savol bo'ladi, ular ${e.qs.length} ta savollik bazadan barcha mavzular bo'yicha mutanosib ravishda tasodifiy tanlanadi. Har bir savolda 4 ta javob varianti bor, faqat bittasi to'g'ri. Vaqt — ${MINUTES} daqiqa; vaqt tugasa, test avtomatik yakunlanadi. Savollar orasida bemalol oldinga-orqaga o'tishingiz mumkin.`, `В тесте ${COUNT} вопросов, они случайно выбираются из базы в ${e.qs.length} вопросов пропорционально по всем темам. В каждом вопросе 4 варианта, верный только один. Время — ${MINUTES} минут; по истечении тест завершится автоматически. Между вопросами можно свободно переходить.`))}</p>
         <label class="exam-f">${L('Ism va familiya', 'Имя и фамилия')}<input id="xname" maxlength="80" value="${esc(me.n || '')}" autocomplete="name"></label>
         <label class="exam-f">${L('Guruh (ixtiyoriy)', 'Группа (необязательно)')}<input id="xgroup" maxlength="40" value="${esc(me.g || '')}"></label>
+        <div class="notice warn exam-rules"><strong>${L('Test qoidalari', 'Правила теста')}:</strong>
+          <ul>
+            <li>${L("Test davomida boshqa ilova, oyna yoki sahifaga o'tmang — har bir chiqish qayd etiladi va natijada ko'rsatiladi.", 'Во время теста не переходите в другие приложения, окна или вкладки — каждый выход фиксируется и отображается в результате.')}</li>
+            <li>${L(`${MAX_LEAVES}-marta chiqqaningizda test avtomatik yakunlanadi.`, `При ${MAX_LEAVES}-м выходе тест завершится автоматически.`)}</li>
+            <li>${L("Kompyuterda test to'liq ekranda ochiladi; undan chiqish ham chiqish hisoblanadi.", 'На компьютере тест открывается во весь экран; выход из него тоже считается выходом.')}</li>
+            <li>${L('Savollarni nusxalash va belgilash o\'chirilgan.', 'Копирование и выделение вопросов отключены.')}</li>
+          </ul></div>
         <p id="xerr" class="notice danger" hidden>${L('Ism va familiyangizni kiriting.', 'Введите имя и фамилию.')}</p>
         <div class="row-actions"><button class="btn big" id="xgo">${L('Testni boshlash', 'Начать тест')}</button></div>
       </div>`;
@@ -66,7 +73,8 @@
       const n = $('xname').value.trim(), g = $('xgroup').value.trim();
       if (n.length < 3) { $('xerr').hidden = false; $('xname').focus(); return; }
       try { localStorage.setItem('psixolab-exam-me', JSON.stringify({ n, g })); } catch (x) {}
-      run = { id, name: n, group: g, items: pick(e), ans: [], cur: 0, t0: Date.now(), done: false };
+      run = { id, name: n, group: g, items: pick(e), ans: [], cur: 0, t0: Date.now(), done: false, leaves: 0, away: 0, awayStart: 0 };
+      goFull();
       run.ans = Array(run.items.length).fill(-1);
       saveRun(run); viewQ();
     });
@@ -79,10 +87,11 @@
     const e = EX[run.id], k = run.cur, it = run.items[k], q = e.qs[it.i], n = run.items.length;
     const answered = run.ans.filter(x => x >= 0).length;
     app.innerHTML = `
-      <div class="exam-bar"><b>${esc(e.title)}</b><span class="exam-timer" id="xtime">${fmt(left())}</span></div>
+      <div class="exam-bar"><b>${esc(e.title)}</b><span class="exam-leaves ${run.leaves ? 'on' : ''}">${L('Chiqishlar', 'Выходы')}: ${run.leaves || 0}/${MAX_LEAVES}</span><span class="exam-timer" id="xtime">${fmt(left())}</span></div>
       <div class="progress"><div style="width:${answered / n * 100}%"></div></div>
       <div class="exam-dots">${run.items.map((_, j) => `<button type="button" data-j="${j}" class="${j === k ? 'cur' : ''} ${run.ans[j] >= 0 ? 'ok' : ''}">${j + 1}</button>`).join('')}</div>
-      <div class="card exam-q">
+      <div class="card exam-q exam-guard" data-wm="${esc(run.name + (run.group ? ' · ' + run.group : ''))}">
+        <div class="exam-wm" aria-hidden="true">${Array.from({ length: 12 }, () => `<span>${esc(run.name)}${run.group ? ' · ' + esc(run.group) : ''}</span>`).join('')}</div>
         <p class="meta">${L('Savol', 'Вопрос')} ${k + 1} / ${n} · ${esc(e.topics[q[0]])}</p>
         <h2>${esc(q[1])}</h2>
         <div class="exam-opts">${it.o.map((oi, j) => `<button type="button" data-o="${oi}" class="${run.ans[k] === oi ? 'on' : ''}"><span>${'ABCD'[j]}</span>${esc(q[2][oi])}</button>`).join('')}</div>
@@ -114,33 +123,36 @@
     tick = setInterval(() => {
       if (!$('xtime')) { clearInterval(tick); return; }
       const s = left(); $('xtime').textContent = fmt(s); $('xtime').classList.toggle('low', s < 120);
-      if (s <= 0) { clearInterval(tick); finish(true); }
+      if (s <= 0) { clearInterval(tick); finish('timeout'); }
     }, 1000);
     window.scrollTo(0, 0);
   }
 
-  function finish(timeout) {
-    clearInterval(tick);
+  function finish(reason) {
+    if (!run || run.done) return;
+    clearInterval(tick); hideWarn(); exitFull();
     const e = EX[run.id], n = run.items.length;
     const ok = run.items.map((it, k) => run.ans[k] === e.qs[it.i][3]);
     const score = ok.filter(Boolean).length, pct = Math.round(score / n * 100), sec = Math.min(MINUTES * 60, Math.round((Date.now() - run.t0) / 1000));
     run.done = true; clearRun();
-    saveResult({ type: 'exam', id: run.id, name: run.name, group: run.group, value: score, max: n, pct, time: sec, q: run.items.map((it, k) => [it.i, run.ans[k]]) });
-    showResult(run, ok, score, pct, sec, timeout);
+    saveResult({ type: 'exam', id: run.id, name: run.name, group: run.group, value: score, max: n, pct, time: sec, q: run.items.map((it, k) => [it.i, run.ans[k]]), leaves: run.leaves || 0, away: Math.round((run.away || 0) / 1000), ended: reason || '' });
+    showResult(run, ok, score, pct, sec, reason);
   }
 
-  function showResult(r, ok, score, pct, sec, timeout) {
+  function showResult(r, ok, score, pct, sec, reason) {
     const e = EX[r.id], n = r.items.length, [g, gw] = grade(pct);
     const byT = e.topics.map((tp, ti) => { const ks = r.items.map((it, k) => k).filter(k => e.qs[r.items[k].i][0] === ti); return [tp, ks.filter(k => ok[k]).length, ks.length]; });
     const d = new Date();
     app.innerHTML = `
       <h1>${esc(e.title)}: ${L('natija', 'результат')}</h1>
-      ${timeout ? `<div class="notice warn">${L('Vaqt tugadi, test avtomatik yakunlandi.', 'Время истекло, тест завершён автоматически.')}</div>` : ''}
+      ${reason === 'timeout' ? `<div class="notice warn">${L('Vaqt tugadi, test avtomatik yakunlandi.', 'Время истекло, тест завершён автоматически.')}</div>` : ''}
+      ${reason === 'cheat' ? `<div class="notice danger">${L(`Test qoidabuzarlik sababli avtomatik yakunlandi: testdan ${MAX_LEAVES} marta chiqildi.`, `Тест завершён автоматически из-за нарушения: выход из теста ${MAX_LEAVES} раза.`)}</div>` : ''}
       <div class="card exam-res">
         <div class="exam-grade g${g}"><b>${g}</b><span>${esc(gw)}</span></div>
         <div>
           <p class="exam-who"><strong>${esc(r.name)}</strong>${r.group ? ` · ${esc(r.group)}` : ''}</p>
           <div class="score">${score} / ${n} <small>(${pct}%)</small></div>
+          <p class="exam-integrity ${r.leaves ? 'bad' : 'ok'}">${r.leaves ? L(`Testdan chiqishlar: ${r.leaves} marta, jami ${Math.round((r.away || 0) / 1000)} soniya`, `Выходы из теста: ${r.leaves}, всего ${Math.round((r.away || 0) / 1000)} сек`) : L("Testdan chiqilmagan ✓", 'Выходов из теста не было ✓')}</p>
           <p class="meta">${d.toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uz-UZ')} ${d.toLocaleTimeString(lang === 'ru' ? 'ru-RU' : 'uz-UZ', { hour: '2-digit', minute: '2-digit' })} · ${L('sarflangan vaqt', 'затрачено')} ${fmt(sec)}</p>
           <p class="meta">${L("Baholash: 86% va yuqori — 5, 71–85% — 4, 55–70% — 3, 55% dan past — 2.", 'Шкала: от 86% — 5, 71–85% — 4, 55–70% — 3, ниже 55% — 2.')}</p>
         </div>
@@ -164,10 +176,58 @@
   describe = function (r) {
     if (r.type === 'exam') {
       const e = EX[r.id] || { title: r.id };
-      return { name: `${e.title} (${L('bilim testi', 'тест знаний')})`, result: `${r.value} / ${r.max} (${r.pct}%)`, note: `${L('Baho', 'Оценка')}: ${grade(r.pct)[0]}${r.name ? ' · ' + r.name : ''}` };
+      return { name: `${e.title} (${L('bilim testi', 'тест знаний')})`, result: `${r.value} / ${r.max} (${r.pct}%)`, note: `${L('Baho', 'Оценка')}: ${grade(r.pct)[0]}${r.name ? ' · ' + r.name : ''}${r.leaves ? ' · ' + L('chiqishlar', 'выходы') + ': ' + r.leaves : ''}` };
     }
     return _desc(r);
   };
+
+
+  // ===== Halollik nazorati: chiqishlarni aniqlash, to'liq ekran, nusxalashni bloklash =====
+  const active = () => run && !run.done && document.querySelector('.exam-guard');
+  function goFull() { const el = document.documentElement; try { if (el.requestFullscreen && !document.fullscreenElement) el.requestFullscreen().catch(() => {}); } catch (e) {} }
+  function exitFull() { try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) {} }
+  let blurT = null, hiddenNow = false;
+  function leaveStart() { if (!active() || run.awayStart) return; run.awayStart = Date.now(); saveRun(run); }
+  function leaveEnd(force) {
+    if (!run || run.done || !run.awayStart) return;
+    const dur = Date.now() - run.awayStart; run.awayStart = 0;
+    if (!force && dur < 1500) { saveRun(run); return; } // juda qisqa fokus yo'qolishi (tizim oynasi va h.k.) hisoblanmaydi
+    run.leaves = (run.leaves || 0) + 1; run.away = (run.away || 0) + dur; saveRun(run);
+    if (run.leaves >= MAX_LEAVES) { finish('cheat'); return; }
+    showWarn();
+    const lv = document.querySelector('.exam-leaves'); if (lv) { lv.textContent = `${L('Chiqishlar', 'Выходы')}: ${run.leaves}/${MAX_LEAVES}`; lv.classList.add('on'); }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { hiddenNow = true; clearTimeout(blurT); leaveStart(); }
+    else { const h = hiddenNow; hiddenNow = false; leaveEnd(h); }
+  });
+  window.addEventListener('blur', () => { if (active()) leaveStart(); });
+  window.addEventListener('focus', () => { if (!document.hidden) leaveEnd(false); });
+  window.addEventListener('pagehide', () => { if (active()) { if (!run.awayStart) run.awayStart = Date.now(); saveRun(run); } });
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && active()) { run.leaves = (run.leaves || 0) + 1; saveRun(run); if (run.leaves >= MAX_LEAVES) finish('cheat'); else { showWarn(true); const lv = document.querySelector('.exam-leaves'); if (lv) { lv.textContent = `${L('Chiqishlar', 'Выходы')}: ${run.leaves}/${MAX_LEAVES}`; lv.classList.add('on'); } } }
+  });
+  function showWarn(fs) {
+    hideWarn();
+    const left = MAX_LEAVES - run.leaves, w = document.createElement('div');
+    w.className = 'exam-warn'; w.id = 'xwarn';
+    w.innerHTML = `<div class="exam-warn-box"><b>⚠ ${L('Diqqat!', 'Внимание!')}</b>
+      <p>${fs ? L("Siz to'liq ekran rejimidan chiqdingiz.", 'Вы вышли из полноэкранного режима.') : L('Siz test sahifasidan chiqdingiz.', 'Вы покинули страницу теста.')} ${L('Bu qayd etildi va natijada ko\'rsatiladi', 'Это зафиксировано и будет показано в результате')} (${run.leaves}/${MAX_LEAVES}).</p>
+      <p><strong>${L(`Yana ${left} marta chiqsangiz, test avtomatik yakunlanadi.`, `Ещё ${left} выход(а) — и тест завершится автоматически.`)}</strong></p>
+      <button class="btn" type="button">${L('Testga qaytish', 'Вернуться к тесту')}</button></div>`;
+    document.body.appendChild(w);
+    w.querySelector('button').addEventListener('click', () => { hideWarn(); goFull(); });
+  }
+  function hideWarn() { const w = $('xwarn'); if (w) w.remove(); }
+  // Nusxalash, belgilash, kontekst menyu va chop etishni bloklash (faqat test savollarida)
+  ['copy', 'cut', 'contextmenu', 'selectstart', 'dragstart'].forEach(ev => document.addEventListener(ev, e => { if (active() && !(e.target.closest && e.target.closest('input,textarea'))) e.preventDefault(); }));
+  document.addEventListener('keydown', e => {
+    if (!active()) return;
+    const k = (e.key || '').toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 'p', 's', 'u'].includes(k)) e.preventDefault();
+    if (k === 'printscreen' || k === 'f12') e.preventDefault();
+  });
+  document.addEventListener('keyup', e => { if (active() && (e.key || '').toLowerCase() === 'printscreen') { try { navigator.clipboard && navigator.clipboard.writeText(''); } catch (x) {} } });
 
   const css = document.createElement('style');
   css.textContent = `
@@ -201,7 +261,16 @@
   .exam-rv li.c{background:#E3F6EF;font-weight:600}.exam-rv li.c span{background:#1F9D7A;color:#fff}
   .exam-rv li.x{background:#FDE7EC}.exam-rv li.x span{background:#E0466B;color:#fff}.exam-rv li em{font-style:normal;color:var(--muted);font-weight:500}
   @media (max-width:640px){.exam-tp{grid-template-columns:1fr 48px}.exam-tpbar{grid-column:1/3;grid-row:2}.exam-dots button{width:30px;height:30px}}
-  @media print{header,footer,.row-actions,nav{display:none!important}.exam-rv{break-inside:avoid}}`;
+  .exam-guard{position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .exam-guard>*:not(.exam-wm){position:relative;z-index:1}
+  .exam-wm{position:absolute;inset:-40px;z-index:0;pointer-events:none;display:flex;flex-wrap:wrap;gap:46px 60px;align-content:flex-start;transform:rotate(-18deg);opacity:.07;font:700 1rem var(--display);color:#16123F;white-space:nowrap}
+  .exam-leaves{font-size:.85rem;font-weight:700;opacity:.6;margin-left:auto}.exam-leaves.on{opacity:1;color:#FF6F91}
+  .exam-warn{position:fixed;inset:0;z-index:999;background:rgba(14,10,40,.78);display:flex;align-items:center;justify-content:center;padding:1rem}
+  .exam-warn-box{background:#fff;color:#1E1A4D;border-radius:18px;padding:1.5rem;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  .exam-warn-box b{font:800 1.3rem var(--display);color:#E0466B}
+  .exam-rules ul{margin:.4rem 0 0;padding-left:1.1rem}.exam-rules li{margin:.2rem 0}
+  .exam-integrity{font-weight:700;margin:.3rem 0}.exam-integrity.ok{color:#1F9D7A}.exam-integrity.bad{color:#E0466B}
+  @media print{header,footer,.row-actions,nav{display:none!important}.exam-rv{break-inside:avoid}.exam-guard{display:none!important}}`;
   document.head.appendChild(css);
 
   const _route = route;
