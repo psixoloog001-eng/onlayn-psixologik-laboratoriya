@@ -264,6 +264,7 @@
       L("Sabrli va bosiqsiz, boshqalarni osongina kechirasiz.", 'Вы терпеливы и спокойны, легко прощаете других.'),
       L("Tez jahlingiz chiqadi, boshqalarning xatolariga toqat qilish qiyin. Bo'shashish va nafas mashqlari foydali.", 'Вы легко раздражаетесь, вам трудно терпеть чужие ошибки. Полезны техники расслабления и дыхания.')]
   });
+  window.PL_PF16 = { F, ORDER: () => ORDER };
   const OPTS = () => lang === 'ru'
     ? ['Совершенно неверно', 'Скорее неверно', 'Ни то ни другое', 'Скорее верно', 'Совершенно верно']
     : ["Mutlaqo noto'g'ri", "Ko'proq noto'g'ri", "Na unisi, na bunisi", "Ko'proq to'g'ri", "Mutlaqo to'g'ri"];

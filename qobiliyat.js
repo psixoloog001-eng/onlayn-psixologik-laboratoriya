@@ -292,6 +292,7 @@
       tip: ["Har kuni 5 daqiqa \"bitta narsaning 10 ta qo'llanilishi\" mashqini qiling, aqliy hujum qoidalarini o'rganing, g'oyalar daftarini yuriting.", 'Каждый день 5 минут делайте упражнение «10 способов применить один предмет», изучите правила мозгового штурма, ведите блокнот идей.'],
       job: ["Dizayner, reklama va marketing, muhandis-ixtirochi, yozuvchi, jurnalist, tadbirkor, arxitektor, ilmiy tadqiqotchi.", 'Дизайнер, реклама и маркетинг, инженер-изобретатель, писатель, журналист, предприниматель, архитектор, исследователь.'] }
   };
+  window.PL_QOB = DEF;
   const AUT = [
     { o: ["G'isht", 'Кирпич'], common: ['qur', 'uy', 'devor', 'bino', 'строи', 'дом', 'стен', 'здан'] },
     { o: ['Plastik shisha (butilka)', 'Пластиковая бутылка'], common: ['suv', 'ichimlik', 'quy', 'вод', 'напит', 'налив'] }
